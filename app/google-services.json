@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "115069143015",
+    "project_id": "wifi-analyzer-d3f1f",
+    "storage_bucket": "wifi-analyzer-d3f1f.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:115069143015:android:00a8d61697c25ba3411f42",
+        "android_client_info": {
+          "package_name": "com.wifianalyzer.wifianalyzerproject"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAaxqIXRLIzWKgER1c566l9l0v_n6quZFA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
