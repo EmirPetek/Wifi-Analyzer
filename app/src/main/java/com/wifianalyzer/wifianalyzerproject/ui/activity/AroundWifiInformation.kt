@@ -5,6 +5,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.location.LocationManager
 import android.net.wifi.ScanResult
@@ -20,7 +21,7 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.firebase.database.FirebaseDatabase
-import com.wifianalyzer.wifianalyzerproject.data.RssiSignal
+import com.wifianalyzer.wifianalyzerproject.data.RssiSignalData
 import com.wifianalyzer.wifianalyzerproject.ui.adapter.AroundWifiInformationAdapter
 import com.wifianalyzer.wifianalyzerproject.databinding.ActivityAroundWifiInformationBinding
 import com.wifianalyzer.wifianalyzerproject.viewmodel.AroundWifiInformationViewModel
@@ -36,7 +37,11 @@ class AroundWifiInformation : AppCompatActivity() {
     private lateinit var locationManager: LocationManager
     private lateinit var adapter: AroundWifiInformationAdapter
     val currentTimestamp = System.currentTimeMillis()
+    private lateinit var sharedPreferences : SharedPreferences //= getSharedPreferences("userInfo", MODE_PRIVATE)
+    private lateinit var userKey : String //= sharedPreferences.getString("userKey", "0")!!
 
+    var period = 0
+    val second = 5000
 
     companion object {
         const val PERMISSIONS_REQUEST_CODE_ACCESS_FINE_LOCATION = 1
@@ -51,10 +56,13 @@ class AroundWifiInformation : AppCompatActivity() {
         locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
 
         binding.progressBarAroundWifi.visibility = View.GONE
-
         checkLocationPermission()
 
+        sharedPreferences = getSharedPreferences("userInfo", MODE_PRIVATE)
+        userKey =  sharedPreferences.getString("userKey", "0")!!
+
         binding.imageViewBackButton.setOnClickListener { finish() }
+
 
         setContentView(binding.root)
     }
@@ -104,12 +112,19 @@ class AroundWifiInformation : AppCompatActivity() {
             override fun run() {
                 handler.post {
                     startWifiScan()
+                    period++
+                    Log.e("period ve second: ", "$period ve $second")
+                    if (period == 3) timer.cancel()
                 }
+
             }
         }
 
-        // Timer'ı her 5 saniyede bir çalışacak şekilde ayarla
-        timer.schedule(task, 0, 5000)
+        // Timer'ı her second.toLong() saniyede bir çalışacak şekilde ayarla
+        timer.schedule(task, 0, second.toLong())
+
+
+
 
         //startWifiScan()
     }
@@ -163,7 +178,7 @@ class AroundWifiInformation : AppCompatActivity() {
             stringBuilder.append("Frequency: ${result.frequency} MHz\n")
             stringBuilder.append("Level: ${result.level} dBm\n")
             stringBuilder.append("\n")
-            val obj = RssiSignal(
+            val obj = RssiSignalData(
                 result.SSID,
                 result.BSSID,
                 result.level,
@@ -171,7 +186,9 @@ class AroundWifiInformation : AppCompatActivity() {
                 System.currentTimeMillis(),
                 null
             )
-            viewModel.insertRssiSignal(obj,currentTimestamp)
+
+            //Log.e("rssi verileri: ", obj.toString())
+          viewModel.insertRssiSignal(obj,userKey,currentTimestamp)
         //insertData(obj,currentTimestamp)
 
 
@@ -183,7 +200,7 @@ class AroundWifiInformation : AppCompatActivity() {
 
     }
 
-    private fun insertData(obj: RssiSignal, currentTimestamp: Long) {
+    private fun insertData(obj: RssiSignalData, currentTimestamp: Long) {
         Log.e("klfgjl", "klsfld")
         val db = FirebaseDatabase.getInstance().getReference("rssiSignals").child(currentTimestamp.toString())
         db.push().setValue(obj).addOnFailureListener { it ->

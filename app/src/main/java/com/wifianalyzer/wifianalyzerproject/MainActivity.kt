@@ -2,19 +2,25 @@ package com.wifianalyzer.wifianalyzerproject
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
+import android.content.SharedPreferences.Editor
 import android.location.LocationManager
 import android.net.wifi.WifiManager
 import android.os.Bundle
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import com.wifianalyzer.wifianalyzerproject.databinding.ActivityMainBinding
 import com.wifianalyzer.wifianalyzerproject.ui.activity.AroundWifiInformation
 import com.wifianalyzer.wifianalyzerproject.ui.activity.CurrentWifiInformation
+import java.security.SecureRandom
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var wifiManager: WifiManager
     private lateinit var locationManager: LocationManager
     private lateinit var binding: ActivityMainBinding
+    private lateinit var sharedPreferences: SharedPreferences
+    private lateinit var editor: Editor
 
     companion object {
         private const val PERMISSIONS_REQUEST_CODE_ACCESS_FINE_LOCATION = 1
@@ -23,6 +29,8 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
+
+        checkOrSaveUser()
 
         wifiManager = applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
         locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
@@ -41,7 +49,46 @@ class MainActivity : AppCompatActivity() {
         binding.buttonGetScanResultData.setOnClickListener { replaceActivity(AroundWifiInformation()) }
 
     }
+    private fun replaceActivity(activity: Activity){
+        startActivity(Intent(this,activity::class.java))
+    }
 
+    private fun checkOrSaveUser(){
+        sharedPreferences = getSharedPreferences("userInfo", MODE_PRIVATE)
+        editor = sharedPreferences.edit()
+
+        val registerState: String = sharedPreferences.getString("registerState", "0")!!
+        val userKeyData: String = sharedPreferences.getString("userKey", "0")!!
+
+        Log.e("dslkfjlsk",userKeyData)
+
+        if (registerState == "0") {
+            registerUser()
+        }
+    }
+
+    fun registerUser() {
+        val sharedPreferences = getSharedPreferences("userInfo", Context.MODE_PRIVATE)
+        editor = sharedPreferences.edit()
+        val userKey = generateRandomKey()
+        editor.putString("userKey", userKey)
+        editor.putString("registerState", "1")
+        editor.commit()
+    }
+
+    fun generateRandomKey(): String {
+        val characterSet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+        val secureRandom = SecureRandom()
+
+        // Random key will be created with 64 character
+        val randomKeyBuilder = StringBuilder()
+        for (i in 0..32) {
+            val randomIndex = secureRandom.nextInt(characterSet.length)
+            val randomChar = characterSet[randomIndex]
+            randomKeyBuilder.append(randomChar)
+        }
+        return randomKeyBuilder.toString()
+    }
 /*
 
 
@@ -145,8 +192,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
 */
-    private fun replaceActivity(activity: Activity){
-        startActivity(Intent(this,activity::class.java))
-    }
+
 
 }
