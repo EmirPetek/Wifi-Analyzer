@@ -1,4 +1,4 @@
-package com.wifianalyzer.wifianalyzerproject.ui
+package com.wifianalyzer.wifianalyzerproject.ui.activity
 
 import android.Manifest
 import android.content.BroadcastReceiver
@@ -15,25 +15,28 @@ import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import android.view.View
+import androidx.activity.viewModels
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.google.firebase.Firebase
 import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.database.database
-import com.wifianalyzer.wifianalyzerproject.R
-import com.wifianalyzer.wifianalyzerproject.data.rssiSignal
+import com.wifianalyzer.wifianalyzerproject.data.RssiSignal
 import com.wifianalyzer.wifianalyzerproject.ui.adapter.AroundWifiInformationAdapter
 import com.wifianalyzer.wifianalyzerproject.databinding.ActivityAroundWifiInformationBinding
+import com.wifianalyzer.wifianalyzerproject.viewmodel.AroundWifiInformationViewModel
 import java.util.Timer
 import java.util.TimerTask
 
 class AroundWifiInformation : AppCompatActivity() {
 
+    private val viewModel : AroundWifiInformationViewModel by viewModels()
+
     private lateinit var binding: ActivityAroundWifiInformationBinding
     private lateinit var wifiManager: WifiManager
     private lateinit var locationManager: LocationManager
     private lateinit var adapter: AroundWifiInformationAdapter
+    val currentTimestamp = System.currentTimeMillis()
+
 
     companion object {
         const val PERMISSIONS_REQUEST_CODE_ACCESS_FINE_LOCATION = 1
@@ -64,7 +67,7 @@ class AroundWifiInformation : AppCompatActivity() {
             ActivityCompat.requestPermissions(
                 this,
                 arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
-                AroundWifiInformation.PERMISSIONS_REQUEST_CODE_ACCESS_FINE_LOCATION
+                PERMISSIONS_REQUEST_CODE_ACCESS_FINE_LOCATION
             )
         } else {
             manageWifiScan()
@@ -78,7 +81,7 @@ class AroundWifiInformation : AppCompatActivity() {
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         when (requestCode) {
-            AroundWifiInformation.PERMISSIONS_REQUEST_CODE_ACCESS_FINE_LOCATION -> {
+            PERMISSIONS_REQUEST_CODE_ACCESS_FINE_LOCATION -> {
                 if ((grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
                     manageWifiScan()
                 } else {
@@ -160,7 +163,7 @@ class AroundWifiInformation : AppCompatActivity() {
             stringBuilder.append("Frequency: ${result.frequency} MHz\n")
             stringBuilder.append("Level: ${result.level} dBm\n")
             stringBuilder.append("\n")
-            val obj = rssiSignal(
+            val obj = RssiSignal(
                 result.SSID,
                 result.BSSID,
                 result.level,
@@ -168,7 +171,8 @@ class AroundWifiInformation : AppCompatActivity() {
                 System.currentTimeMillis(),
                 null
             )
-            insertData(obj)
+            viewModel.insertRssiSignal(obj,currentTimestamp)
+        //insertData(obj,currentTimestamp)
 
 
         }
@@ -179,12 +183,11 @@ class AroundWifiInformation : AppCompatActivity() {
 
     }
 
-    private fun insertData(obj: rssiSignal) {
+    private fun insertData(obj: RssiSignal, currentTimestamp: Long) {
         Log.e("klfgjl", "klsfld")
-        val db = FirebaseDatabase.getInstance().getReference("rssiSignals").child("")
+        val db = FirebaseDatabase.getInstance().getReference("rssiSignals").child(currentTimestamp.toString())
         db.push().setValue(obj).addOnFailureListener { it ->
             Log.e("hata: ", it.toString())
         }
-
     }
 }
