@@ -1,7 +1,7 @@
 package com.wifianalyzer.wifianalyzerproject.data
 
 
-data class RssiSignal(
+data class RssiSignalData(
     val ssid:String,
     val bssid:String,
     val rssi:Int,
