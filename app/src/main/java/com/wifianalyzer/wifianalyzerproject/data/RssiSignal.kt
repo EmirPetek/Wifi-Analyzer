@@ -1,9 +1,7 @@
 package com.wifianalyzer.wifianalyzerproject.data
 
-import java.io.Serializable
 
-
-data class rssiSignal(
+data class RssiSignal(
     val ssid:String,
     val bssid:String,
     val rssi:Int,

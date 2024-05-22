@@ -1,25 +1,14 @@
 package com.wifianalyzer.wifianalyzerproject
-import android.Manifest
 import android.app.Activity
-import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import android.content.IntentFilter
-import android.content.pm.PackageManager
 import android.location.LocationManager
-import android.net.wifi.ScanResult
-import android.net.wifi.WifiInfo
 import android.net.wifi.WifiManager
 import android.os.Bundle
-import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
-import androidx.fragment.app.Fragment
-import com.google.firebase.database.FirebaseDatabase
 import com.wifianalyzer.wifianalyzerproject.databinding.ActivityMainBinding
-import com.wifianalyzer.wifianalyzerproject.ui.AroundWifiInformation
-import com.wifianalyzer.wifianalyzerproject.ui.CurrentWifiInformation
+import com.wifianalyzer.wifianalyzerproject.ui.activity.AroundWifiInformation
+import com.wifianalyzer.wifianalyzerproject.ui.activity.CurrentWifiInformation
 
 class MainActivity : AppCompatActivity() {
 

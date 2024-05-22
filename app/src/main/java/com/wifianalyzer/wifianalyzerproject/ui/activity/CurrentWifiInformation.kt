@@ -1,4 +1,4 @@
-package com.wifianalyzer.wifianalyzerproject.ui
+package com.wifianalyzer.wifianalyzerproject.ui.activity
 
 import android.Manifest
 import android.content.BroadcastReceiver
@@ -7,7 +7,6 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.location.LocationManager
-import android.net.wifi.ScanResult
 import android.net.wifi.WifiInfo
 import android.net.wifi.WifiManager
 import androidx.appcompat.app.AppCompatActivity
@@ -15,7 +14,6 @@ import android.os.Bundle
 import android.view.View
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import com.wifianalyzer.wifianalyzerproject.R
 import com.wifianalyzer.wifianalyzerproject.databinding.ActivityCurrentWifiInformationBinding
 
 class CurrentWifiInformation : AppCompatActivity() {
@@ -48,7 +46,7 @@ class CurrentWifiInformation : AppCompatActivity() {
             ActivityCompat.requestPermissions(
                 this,
                 arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
-                CurrentWifiInformation.PERMISSIONS_REQUEST_CODE_ACCESS_FINE_LOCATION
+                PERMISSIONS_REQUEST_CODE_ACCESS_FINE_LOCATION
             )
         } else {
             startWifiScan()
@@ -58,7 +56,7 @@ class CurrentWifiInformation : AppCompatActivity() {
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         when (requestCode) {
-            CurrentWifiInformation.PERMISSIONS_REQUEST_CODE_ACCESS_FINE_LOCATION -> {
+            PERMISSIONS_REQUEST_CODE_ACCESS_FINE_LOCATION -> {
                 if ((grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
                     startWifiScan()
                 } else {
