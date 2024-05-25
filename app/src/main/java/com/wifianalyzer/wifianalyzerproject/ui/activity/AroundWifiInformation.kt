@@ -43,6 +43,9 @@ class AroundWifiInformation : AppCompatActivity() {
     var period = 0
     val second = 5000
 
+    private var duration = 0
+    private var interval = 0
+
     companion object {
         const val PERMISSIONS_REQUEST_CODE_ACCESS_FINE_LOCATION = 1
     }
@@ -59,10 +62,17 @@ class AroundWifiInformation : AppCompatActivity() {
         checkLocationPermission()
 
         sharedPreferences = getSharedPreferences("userInfo", MODE_PRIVATE)
-        userKey =  sharedPreferences.getString("userKey", "0")!!
+        userKey = sharedPreferences.getString("userKey", "0")!!
 
         binding.imageViewBackButton.setOnClickListener { finish() }
 
+        // Intent'ten verileri al
+        duration = intent.getStringExtra("DURATION")?.toInt() ?: 0
+        interval = intent.getStringExtra("INTERVAL")?.toInt() ?: 0
+        val location = intent.getStringExtra("LOCATION") ?: ""
+
+        // Log the received data
+        Log.d("AroundWifiInformation", "Received Duration: $duration, Interval: $interval, Location: $location")
 
         setContentView(binding.root)
     }
