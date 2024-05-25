@@ -7,6 +7,9 @@ import android.content.SharedPreferences.Editor
 import android.location.LocationManager
 import android.net.wifi.WifiManager
 import android.os.Bundle
+import android.widget.Button
+import androidx.appcompat.app.AlertDialog
+import android.widget.Toast
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import com.wifianalyzer.wifianalyzerproject.databinding.ActivityMainBinding
@@ -46,7 +49,10 @@ class MainActivity : AppCompatActivity() {
     private fun bindButtons(){
 
         binding.buttonGetCurrentWifiInfo.setOnClickListener { replaceActivity(CurrentWifiInformation()) }
-        binding.buttonGetScanResultData.setOnClickListener { replaceActivity(AroundWifiInformation()) }
+        binding.buttonGetScanResultData.setOnClickListener {
+            showCustomAlertDialog()
+
+             }
 
     }
     private fun replaceActivity(activity: Activity){
@@ -89,109 +95,159 @@ class MainActivity : AppCompatActivity() {
         }
         return randomKeyBuilder.toString()
     }
-/*
 
+    private fun showCustomAlertDialog() {
+        // Özel alert dialog layout'unu inflate edin
+        val dialogView = layoutInflater.inflate(R.layout.main_menu_alert_dialog, null)
 
-    private fun checkLocationPermission() {
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
-            != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(
-                this,
-                arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
-                PERMISSIONS_REQUEST_CODE_ACCESS_FINE_LOCATION
-            )
-        } else {
-            startWifiScan()
+        // AlertDialog Builder kullanarak dialog oluşturun
+        val dialog = AlertDialog.Builder(this)
+            .setView(dialogView)
+            .create()
+
+        // Dialog üzerindeki butonları ve edittext'leri bulun
+        val etDuration = dialogView.findViewById<android.widget.EditText>(R.id.etDuration)
+        val etInterval = dialogView.findViewById<android.widget.EditText>(R.id.etInterval)
+        val etLocation = dialogView.findViewById<android.widget.EditText>(R.id.etLocation)
+        val btnCancel = dialogView.findViewById<Button>(R.id.btnCancel)
+        val btnOk = dialogView.findViewById<Button>(R.id.btnOk)
+
+        // Cancel butonuna tıklandığında yapılacak işlemler
+        btnCancel.setOnClickListener {
+            dialog.dismiss()
+            Toast.makeText(this, "Main Menuye Dönülüyor", Toast.LENGTH_SHORT).show()
         }
+
+        // Ok butonuna tıklandığında yapılacak işlemler
+        btnOk.setOnClickListener {
+            val duration = etDuration.text.toString()
+            val interval = etInterval.text.toString()
+            val location = etLocation.text.toString()
+
+            // Log the data before sending the Intent
+            Log.d("MainActivity", "Duration: $duration, Interval: $interval, Location: $location")
+
+            // Intent ile verileri AroundWifiInformation aktivitesine gönder
+            val intent = Intent(this, AroundWifiInformation::class.java).apply {
+                putExtra("DURATION", duration)
+                putExtra("INTERVAL", interval)
+                putExtra("LOCATION", location)
+            }
+            startActivity(intent)
+
+            dialog.dismiss()
+        }
+
+        // Dialog'u göster
+        dialog.show()
     }
 
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        when (requestCode) {
-            PERMISSIONS_REQUEST_CODE_ACCESS_FINE_LOCATION -> {
-                if ((grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
-                    startWifiScan()
-                } else {
-                    // Permission denied, handle as appropriate
+
+
+
+    /*
+
+
+        private fun checkLocationPermission() {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(
+                    this,
+                    arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
+                    PERMISSIONS_REQUEST_CODE_ACCESS_FINE_LOCATION
+                )
+            } else {
+                startWifiScan()
+            }
+        }
+
+        override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
+            super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+            when (requestCode) {
+                PERMISSIONS_REQUEST_CODE_ACCESS_FINE_LOCATION -> {
+                    if ((grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
+                        startWifiScan()
+                    } else {
+                        // Permission denied, handle as appropriate
+                    }
+                    return
                 }
-                return
-            }
-            else -> {
-                // Ignore all other requests.
-            }
-        }
-    }
-
-    private fun startWifiScan() {
-        val wifiScanReceiver = object : BroadcastReceiver() {
-            override fun onReceive(context: Context?, intent: Intent?) {
-                val success = intent?.getBooleanExtra(WifiManager.EXTRA_RESULTS_UPDATED, false) ?: false
-                if (success) {
-                    scanSuccess()
-                } else {
-                    scanFailure()
+                else -> {
+                    // Ignore all other requests.
                 }
             }
         }
 
-        val intentFilter = IntentFilter()
-        intentFilter.addAction(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION)
-        registerReceiver(wifiScanReceiver, intentFilter)
+        private fun startWifiScan() {
+            val wifiScanReceiver = object : BroadcastReceiver() {
+                override fun onReceive(context: Context?, intent: Intent?) {
+                    val success = intent?.getBooleanExtra(WifiManager.EXTRA_RESULTS_UPDATED, false) ?: false
+                    if (success) {
+                        scanSuccess()
+                    } else {
+                        scanFailure()
+                    }
+                }
+            }
 
-        val success = wifiManager.startScan()
-        if (!success) {
-            // scan failure handling
-            scanFailure()
-        }
-    }
+            val intentFilter = IntentFilter()
+            intentFilter.addAction(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION)
+            registerReceiver(wifiScanReceiver, intentFilter)
 
-    private fun scanSuccess() {
-        val results = wifiManager.scanResults
-        displayScanResults(results)
-        getCurrentConnectionInfo()
-    }
-
-    private fun scanFailure() {
-        val results = wifiManager.scanResults
-        // handle failure: new scan did NOT succeed
-        // consider using old scan results: these are the OLD results!
-        displayScanResults(results)
-        getCurrentConnectionInfo()
-    }
-
-    private fun displayScanResults(results: List<ScanResult>) {
-        val stringBuilder = StringBuilder()
-        for (result in results) {
-            stringBuilder.append("SSID: ${result.SSID}\n")
-            stringBuilder.append("BSSID: ${result.BSSID}\n")
-            stringBuilder.append("Capabilities: ${result.capabilities}\n")
-            stringBuilder.append("Frequency: ${result.frequency} MHz\n")
-            stringBuilder.append("Level: ${result.level} dBm\n")
-            stringBuilder.append("\n")
-        }
-        binding.buttonGetScanResultData.setOnClickListener {
-            replaceActivity(AroundWifiInformation())
-           // binding.textViewScanResult.text = stringBuilder.toString()
+            val success = wifiManager.startScan()
+            if (!success) {
+                // scan failure handling
+                scanFailure()
+            }
         }
 
-    }
-
-    fun getCurrentConnectionInfo() {
-        val wifiInfo: WifiInfo = wifiManager.connectionInfo
-        val stringBuilder = StringBuilder()
-        stringBuilder.append("SSID: ${wifiInfo.ssid}\n")
-        stringBuilder.append("BSSID: ${wifiInfo.bssid}\n")
-        stringBuilder.append("Link Speed: ${wifiInfo.linkSpeed} Mbps\n")
-        stringBuilder.append("RSSI: ${wifiInfo.rssi} dBm\n")
-        stringBuilder.append("IP Address: ${wifiInfo.ipAddress}\n")
-
-        binding.buttonGetCurrentWifiInfo.setOnClickListener {
-            //replaceActivity(a())
-
-        //  binding.textViewCurrentInfo.text = stringBuilder.toString()
+        private fun scanSuccess() {
+            val results = wifiManager.scanResults
+            displayScanResults(results)
+            getCurrentConnectionInfo()
         }
-    }
-*/
+
+        private fun scanFailure() {
+            val results = wifiManager.scanResults
+            // handle failure: new scan did NOT succeed
+            // consider using old scan results: these are the OLD results!
+            displayScanResults(results)
+            getCurrentConnectionInfo()
+        }
+
+        private fun displayScanResults(results: List<ScanResult>) {
+            val stringBuilder = StringBuilder()
+            for (result in results) {
+                stringBuilder.append("SSID: ${result.SSID}\n")
+                stringBuilder.append("BSSID: ${result.BSSID}\n")
+                stringBuilder.append("Capabilities: ${result.capabilities}\n")
+                stringBuilder.append("Frequency: ${result.frequency} MHz\n")
+                stringBuilder.append("Level: ${result.level} dBm\n")
+                stringBuilder.append("\n")
+            }
+            binding.buttonGetScanResultData.setOnClickListener {
+                replaceActivity(AroundWifiInformation())
+               // binding.textViewScanResult.text = stringBuilder.toString()
+            }
+
+        }
+
+        fun getCurrentConnectionInfo() {
+            val wifiInfo: WifiInfo = wifiManager.connectionInfo
+            val stringBuilder = StringBuilder()
+            stringBuilder.append("SSID: ${wifiInfo.ssid}\n")
+            stringBuilder.append("BSSID: ${wifiInfo.bssid}\n")
+            stringBuilder.append("Link Speed: ${wifiInfo.linkSpeed} Mbps\n")
+            stringBuilder.append("RSSI: ${wifiInfo.rssi} dBm\n")
+            stringBuilder.append("IP Address: ${wifiInfo.ipAddress}\n")
+
+            binding.buttonGetCurrentWifiInfo.setOnClickListener {
+                //replaceActivity(a())
+
+            //  binding.textViewCurrentInfo.text = stringBuilder.toString()
+            }
+        }
+    */
 
 
 }
