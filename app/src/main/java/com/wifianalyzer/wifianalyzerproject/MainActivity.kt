@@ -50,8 +50,8 @@ class MainActivity : AppCompatActivity() {
 
         binding.buttonGetCurrentWifiInfo.setOnClickListener { replaceActivity(CurrentWifiInformation()) }
         binding.buttonGetScanResultData.setOnClickListener {
-            showCustomAlertDialog()
-
+         //   showCustomAlertDialog()
+            replaceActivity(AroundWifiInformation())
              }
 
     }
@@ -98,7 +98,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun showCustomAlertDialog() {
         // Özel alert dialog layout'unu inflate edin
-        val dialogView = layoutInflater.inflate(R.layout.main_menu_alert_dialog, null)
+        val dialogView = layoutInflater.inflate(R.layout.alert_assign_around_wifi_scan_data, null)
 
         // AlertDialog Builder kullanarak dialog oluşturun
         val dialog = AlertDialog.Builder(this)
