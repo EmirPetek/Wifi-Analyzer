@@ -13,24 +13,38 @@
         android:layout_height="90dp"
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
-        android:text="Bağlı Ağa Ait Bilgileri Getir"
+        android:text="@string/get_around_wifi_information"
         android:textColor="#FFFFFF"
         android:textSize="16sp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/textViewWarnLocation" />
 
     <Button
         android:id="@+id/buttonGetCurrentWifiInfo"
         android:layout_width="180dp"
         android:layout_height="90dp"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
         android:layout_marginEnd="16dp"
-        android:text="Current Wifi Info"
+        android:text="@string/get_current_wifi_information"
         android:textColor="#FFFFFF"
         android:textSize="16sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/buttonGetScanResultData"
+        app:layout_constraintTop_toTopOf="@+id/buttonGetScanResultData" />
+
+    <TextView
+        android:id="@+id/textViewWarnLocation"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingLeft="20dp"
+        android:paddingTop="10dp"
+        android:paddingRight="20dp"
+        android:text="@string/location_should_open"
+        android:textAlignment="center"
+        android:textColor="#000000"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
