@@ -49,6 +49,7 @@ class AroundWifiInformation : AppCompatActivity() {
     private var location = ""
     private var isStartedScan = 0 // 0 hiç başlatılmamış, 1 başlatılmış, 2 başlatılıp durdurulmuş
     var timer = Timer()
+    var unixtimestamp : Long = 0
 
     companion object {
         const val PERMISSIONS_REQUEST_CODE_ACCESS_FINE_LOCATION = 1
@@ -127,6 +128,7 @@ class AroundWifiInformation : AppCompatActivity() {
             override fun run() {
                 handler.post {
                     period--
+                    unixtimestamp = System.currentTimeMillis()
                     if (period <= 0 ) {
                         timer.cancel()
                         Toast.makeText(applicationContext,getString(R.string.scan_finished),Toast.LENGTH_SHORT).show()
@@ -171,12 +173,12 @@ class AroundWifiInformation : AppCompatActivity() {
                     System.currentTimeMillis(),
                     userKey
                 )
+            viewModel.insertRssiSignal(rssiObjList,userKey, unixtimestamp)
         }
 
         Log.e("rssi verileri: ", rssiObjList.toString())
 
         Log.e("sayısal veriler: ", "period: $period || interval: $interval || duration: $duration")
-        viewModel.insertRssiSignal(rssiObjList,userKey,System.currentTimeMillis())
 
         binding.recyclerViewAroundWifi.setHasFixedSize(true)
         binding.recyclerViewAroundWifi.layoutManager = LinearLayoutManager(this)
@@ -211,6 +213,7 @@ class AroundWifiInformation : AppCompatActivity() {
             dialog.dismiss()
             binding.buttonStartScan.setText(getString(R.string.stop_scan))
             isStartedScan = 1
+            unixtimestamp = System.currentTimeMillis()
         }
 
         dialog.show()

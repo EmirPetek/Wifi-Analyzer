@@ -10,8 +10,8 @@ class RssiSignalsRepo {
     val rssiSignalList : MutableLiveData<List<RssiSignalData>> = MutableLiveData()
     val dbRefRssiSignal = FirebaseDatabase.getInstance().getReference("rssiSignals")
 
-    fun insertRssiSignal(obj: RssiSignalData, userkey: String, currentTimestamp: Long){
-        val db = dbRefRssiSignal.child(userkey).child(currentTimestamp.toString())
+    fun insertRssiSignal(obj: RssiSignalData, userkey: String, unixtimestamp: Long){
+        val db = dbRefRssiSignal.child(userkey).child(unixtimestamp.toString())
         db.push().setValue(obj).addOnFailureListener { it ->
             Log.e("hata: ", it.toString())
         }

@@ -8,7 +8,7 @@ class AroundWifiInformationViewModel : ViewModel(){
 
     val rssiSignalRepo = RssiSignalsRepo()
 
-    fun insertRssiSignal(obj: RssiSignalData, userkey: String, currentTimestamp: Long){
-        rssiSignalRepo.insertRssiSignal(obj,userkey,currentTimestamp)
+    fun insertRssiSignal(obj: RssiSignalData, userkey: String, unixtimestamp: Long){
+        rssiSignalRepo.insertRssiSignal(obj,userkey,unixtimestamp)
     }
 }
