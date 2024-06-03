@@ -47,7 +47,7 @@ class AroundWifiInformation : AppCompatActivity() {
     private var duration = 0
     private var interval = 0
     private var location = ""
-    private var isStartedScan = 0 // 0 hiç başlatılmamış, 1 başlatılmış, 2 başlatılıp durdurulmuş
+    private var isStartedScan = 0 // 0 hiç başlatılmamış / durdurulmuş halde, 1 başlatılmış
     var timer = Timer()
     var unixtimestamp : Long = 0
 
@@ -77,9 +77,6 @@ class AroundWifiInformation : AppCompatActivity() {
                 binding.buttonStartScan.setText(getString(R.string.start_scan))
                 Toast.makeText(applicationContext,getString(R.string.scan_finished),Toast.LENGTH_SHORT).show()
                 period = 0
-            }
-            if (isStartedScan == 2){
-                isStartedScan = 0
             }
         }
         binding.imageViewBackButton.setOnClickListener { finish() }
