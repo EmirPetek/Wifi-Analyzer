@@ -2,7 +2,6 @@ package com.wifianalyzer.wifianalyzerproject.repository
 
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.liveData
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
