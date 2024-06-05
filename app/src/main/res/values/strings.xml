@@ -7,9 +7,6 @@
     <string name="cancel">İPTAL ET</string>
 
 
-
-
-
     <string name="around_wifi_information">ÇEVREDEKİ WIFI BİLGİLERİ</string>
     <string name="around_wifi_information_parameters">ÇEVREDEKİ WIFI BİLGİLERİ \n PARAMETRE GİRİNİZ</string>
     <string name="total_time_as_min">Tarama yapılacak dakika sayısını giriniz</string>
@@ -18,4 +15,5 @@
     <string name="get_around_wifi_information">Çevredeki Ağ Bilgilerini Getir</string>
     <string name="get_current_wifi_information">Current Wifi Info</string>
     <string name="scan_finished">Tarama işlemi sona erdi.</string>
+    <string name="date_format">DD/MM/YYYY HH:MM:SS</string>
 </resources>
