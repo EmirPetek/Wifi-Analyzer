@@ -8,8 +8,11 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.wifianalyzer.wifianalyzerproject.R
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
-class AroundWifiResultsDateAdapter(var context: Context, var result : List<ScanResult>)
+class AroundWifiResultsDateAdapter(var context: Context, var result : List<Long>)
     : RecyclerView.Adapter<AroundWifiResultsDateAdapter.CardViewObjHolder>() {
 
     class CardViewObjHolder(view : View) : RecyclerView.ViewHolder(view){
@@ -26,7 +29,21 @@ class AroundWifiResultsDateAdapter(var context: Context, var result : List<ScanR
     }
 
     override fun onBindViewHolder(holder: CardViewObjHolder, position: Int) {
-        TODO("Not yet implemented")
+        var pos = convertUnixTimestampToDate(result[position])
+
+        holder.textViewAroundWifiResultDbUnixtime.text = pos
+    }
+
+
+    fun convertUnixTimestampToDate(unixTimestamp: Long): String {
+        // Unix timestamp'i milisaniye cinsine dönüştür
+        val date = Date(unixTimestamp )
+
+        // Tarih formatını belirle
+        val dateFormat = SimpleDateFormat("dd/MM/yyyy HH:mm:ss:SSS", Locale.getDefault())
+
+        // Tarihi belirtilen formata göre biçimlendir
+        return dateFormat.format(date)
     }
 
 }
