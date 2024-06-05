@@ -22,6 +22,7 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.firebase.database.FirebaseDatabase
 import com.wifianalyzer.wifianalyzerproject.R
@@ -47,8 +48,11 @@ class AroundWifiInformation : AppCompatActivity() {
     private var duration = 0
     private var interval = 0
     private var location = ""
-    private var isStartedScan = 0 // 0 hiç başlatılmamış, 1 başlatılmış, 2 başlatılıp durdurulmuş
+    private var isStartedScan = 0 // 0 hiç başlatılmamış / durdurulmuş halde, 1 başlatılmış
     var timer = Timer()
+    var unixtimestamp : Long = 0
+    private  var rssiSignalList: List<RssiSignalData> = mutableListOf()
+    private  var rssiSignalUnixTsList: List<Long> = mutableListOf()
 
     companion object {
         const val PERMISSIONS_REQUEST_CODE_ACCESS_FINE_LOCATION = 1
@@ -77,9 +81,6 @@ class AroundWifiInformation : AppCompatActivity() {
                 Toast.makeText(applicationContext,getString(R.string.scan_finished),Toast.LENGTH_SHORT).show()
                 period = 0
             }
-            if (isStartedScan == 2){
-                isStartedScan = 0
-            }
         }
         binding.imageViewBackButton.setOnClickListener { finish() }
 
@@ -98,6 +99,44 @@ class AroundWifiInformation : AppCompatActivity() {
         val intentFilter = IntentFilter()
         intentFilter.addAction(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION)
         registerReceiver(wifiScanReceiver, intentFilter)
+        Log.e("kjdfsd",userKey)
+
+
+        viewModel.getRssiUnixtsListData(userKey)
+        viewModel.rssiUnixtsList.observe(this, Observer {
+            rssiSignalUnixTsList = it
+            Log.e("rssiSignalUnixTsList  in scope -> ", rssiSignalUnixTsList.toString())
+
+        })
+
+        viewModel.getRssiListData(rssiSignalUnixTsList,userKey)
+        viewModel.rssiList.observe(this,Observer{
+            rssiSignalList = it
+            Log.e("rssiSignalList in scope -> ", rssiSignalList.toString())
+        })
+
+        Log.e("rssiSignalUnixTsList -> ", rssiSignalUnixTsList.toString())
+        Log.e("rssiSignalList -> ", rssiSignalList.toString())
+
+
+        binding.textViewAroundWifiTitle.setOnClickListener {
+            viewModel.getRssiListData(rssiSignalUnixTsList,userKey)
+            viewModel.rssiList.observe(this, Observer {
+                var currentSize = it.size
+                Log.e("rssiList size ->" , it.size.toString())
+                Log.e("rssiList ->" , it.toString())
+                for (i in it){
+                  //  Log.e("UNIXTS ICINDEKI VERILER", i.toString())
+                }
+                rssiSignalList = it
+            }).runCatching {
+                Log.e("LISTE", rssiSignalList.toString())
+
+            }
+            Log.e("timeeee: ", System.currentTimeMillis().toString())
+
+
+        }
     }
 
     override fun onDestroy() {
@@ -127,6 +166,7 @@ class AroundWifiInformation : AppCompatActivity() {
             override fun run() {
                 handler.post {
                     period--
+                    unixtimestamp = System.currentTimeMillis()
                     if (period <= 0 ) {
                         timer.cancel()
                         Toast.makeText(applicationContext,getString(R.string.scan_finished),Toast.LENGTH_SHORT).show()
@@ -171,12 +211,12 @@ class AroundWifiInformation : AppCompatActivity() {
                     System.currentTimeMillis(),
                     userKey
                 )
+            viewModel.insertRssiSignal(rssiObjList,userKey, unixtimestamp)
         }
 
         Log.e("rssi verileri: ", rssiObjList.toString())
 
         Log.e("sayısal veriler: ", "period: $period || interval: $interval || duration: $duration")
-        viewModel.insertRssiSignal(rssiObjList,userKey,System.currentTimeMillis())
 
         binding.recyclerViewAroundWifi.setHasFixedSize(true)
         binding.recyclerViewAroundWifi.layoutManager = LinearLayoutManager(this)
@@ -211,6 +251,7 @@ class AroundWifiInformation : AppCompatActivity() {
             dialog.dismiss()
             binding.buttonStartScan.setText(getString(R.string.stop_scan))
             isStartedScan = 1
+            unixtimestamp = System.currentTimeMillis()
         }
 
         dialog.show()

@@ -43,6 +43,7 @@
             android:layout_marginStart="8dp"
             android:layout_marginTop="16dp"
             android:layout_marginBottom="16dp"
+            android:clickable="true"
             android:text="@string/around_wifi_information"
             android:textColor="#000000"
             android:textSize="16sp"
