@@ -22,6 +22,7 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.firebase.database.FirebaseDatabase
 import com.wifianalyzer.wifianalyzerproject.R
@@ -50,6 +51,8 @@ class AroundWifiInformation : AppCompatActivity() {
     private var isStartedScan = 0 // 0 hiç başlatılmamış / durdurulmuş halde, 1 başlatılmış
     var timer = Timer()
     var unixtimestamp : Long = 0
+    private  var rssiSignalList: List<RssiSignalData> = mutableListOf()
+    private  var rssiSignalUnixTsList: List<Long> = mutableListOf()
 
     companion object {
         const val PERMISSIONS_REQUEST_CODE_ACCESS_FINE_LOCATION = 1
@@ -96,6 +99,44 @@ class AroundWifiInformation : AppCompatActivity() {
         val intentFilter = IntentFilter()
         intentFilter.addAction(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION)
         registerReceiver(wifiScanReceiver, intentFilter)
+        Log.e("kjdfsd",userKey)
+
+
+        viewModel.getRssiUnixtsListData(userKey)
+        viewModel.rssiUnixtsList.observe(this, Observer {
+            rssiSignalUnixTsList = it
+            Log.e("rssiSignalUnixTsList  in scope -> ", rssiSignalUnixTsList.toString())
+
+        })
+
+        viewModel.getRssiListData(rssiSignalUnixTsList,userKey)
+        viewModel.rssiList.observe(this,Observer{
+            rssiSignalList = it
+            Log.e("rssiSignalList in scope -> ", rssiSignalList.toString())
+        })
+
+        Log.e("rssiSignalUnixTsList -> ", rssiSignalUnixTsList.toString())
+        Log.e("rssiSignalList -> ", rssiSignalList.toString())
+
+
+        binding.textViewAroundWifiTitle.setOnClickListener {
+            viewModel.getRssiListData(rssiSignalUnixTsList,userKey)
+            viewModel.rssiList.observe(this, Observer {
+                var currentSize = it.size
+                Log.e("rssiList size ->" , it.size.toString())
+                Log.e("rssiList ->" , it.toString())
+                for (i in it){
+                  //  Log.e("UNIXTS ICINDEKI VERILER", i.toString())
+                }
+                rssiSignalList = it
+            }).runCatching {
+                Log.e("LISTE", rssiSignalList.toString())
+
+            }
+            Log.e("timeeee: ", System.currentTimeMillis().toString())
+
+
+        }
     }
 
     override fun onDestroy() {
