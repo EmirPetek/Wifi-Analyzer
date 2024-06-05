@@ -8,9 +8,10 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import com.wifianalyzer.wifianalyzerproject.data.RssiSignalData
+import com.wifianalyzer.wifianalyzerproject.repository.`interface`.rssiSignalRepoFunctions
 
 
-class RssiSignalsRepo {
+class RssiSignalsRepo : rssiSignalRepoFunctions{
     var rssiSignalList : MutableLiveData<List<RssiSignalData>> = MutableLiveData<List<RssiSignalData>>()  //= _rssiSignalList
     //private lateinit var _rssiSignalList : MutableLiveData<List<RssiSignalData>>
 
@@ -20,14 +21,14 @@ class RssiSignalsRepo {
 
     val dbRefRssiSignal = FirebaseDatabase.getInstance().getReference("rssiSignals")
 
-     fun insertRssiSignal(obj: RssiSignalData, userkey: String, unixtimestamp: Long){
+     override fun insertRssiSignal(obj: RssiSignalData, userkey: String, unixtimestamp: Long){
         val db = dbRefRssiSignal.child(userkey).child(unixtimestamp.toString())
         db.push().setValue(obj).addOnFailureListener { it ->
             Log.e("hata: ", it.toString())
         }
     }
 
-     fun getRssiUnixtsListData(userkey: String){
+    override fun getRssiUnixtsListData(userkey: String){
         Log.e("userkey", userkey)
         dbRefRssiSignal
             .child(userkey)
@@ -53,7 +54,7 @@ class RssiSignalsRepo {
         })
     }
 
-     fun getRssiList(unixtimestamp: List<Long>, userkey: String){
+    override fun getRssiList(unixtimestamp: List<Long>, userkey: String){
         val dataList: ArrayList<RssiSignalData> = arrayListOf()
         val database = FirebaseDatabase.getInstance()
         val rssiSignalRef = database.getReference("rssiSignals")
