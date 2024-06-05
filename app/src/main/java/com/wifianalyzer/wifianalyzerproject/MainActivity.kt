@@ -14,6 +14,7 @@ import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import com.wifianalyzer.wifianalyzerproject.databinding.ActivityMainBinding
 import com.wifianalyzer.wifianalyzerproject.ui.activity.AroundWifiInformation
+import com.wifianalyzer.wifianalyzerproject.ui.activity.AroundWifiResultsDate
 import com.wifianalyzer.wifianalyzerproject.ui.activity.CurrentWifiInformation
 import java.security.SecureRandom
 
@@ -48,11 +49,10 @@ class MainActivity : AppCompatActivity() {
 
     private fun bindButtons(){
 
-        binding.buttonGetCurrentWifiInfo.setOnClickListener { replaceActivity(CurrentWifiInformation()) }
-        binding.buttonGetScanResultData.setOnClickListener {
-         //   showCustomAlertDialog()
-            replaceActivity(AroundWifiInformation())
-             }
+        binding.buttonGetCurrentWifiInfo.setOnClickListener { replaceActivity(CurrentWifiInformation())  }
+        binding.buttonGetScanResultData.setOnClickListener { replaceActivity(AroundWifiInformation())    }
+        binding.buttonGetData.setOnClickListener{ replaceActivity(AroundWifiResultsDate()) }
+
 
     }
     private fun replaceActivity(activity: Activity){
