@@ -59,7 +59,7 @@ class RssiSignalsRepo : rssiSignalRepoFunctions{
         val rssiSignalRef = database.getReference("rssiSignals")
 
 
-            rssiSignalRef.child(userkey).child(unixtimestamp.toString()).get()
+        rssiSignalRef.child(userkey).child(unixtimestamp.toString()).get()
                 .addOnSuccessListener { snapshot: DataSnapshot ->
                     if (snapshot.exists()) {
                         for (dataSnapshot in snapshot.children) {

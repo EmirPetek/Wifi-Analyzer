@@ -3,6 +3,7 @@ package com.wifianalyzer.wifianalyzerproject.ui.activity
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.text.Layout
+import android.view.View
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -29,12 +30,14 @@ class AroundWifiResultsDate : AppCompatActivity() {
         sharedPreferences = getSharedPreferences("userInfo", MODE_PRIVATE)
         userKey = sharedPreferences.getString("userKey", "0")!!
 
+        binding.progressBarAroundWifiResultsDate.visibility = View.VISIBLE
         viewModel.getRssiUnixtsListData(userKey)
         viewModel.rssiSignalUnixtsList.observe(this, Observer {
             binding.recyclerViewAroundWifiResultsDate.setHasFixedSize(true)
             binding.recyclerViewAroundWifiResultsDate.layoutManager = LinearLayoutManager(this)
             adapter = AroundWifiResultsDateAdapter(this,it)
             binding.recyclerViewAroundWifiResultsDate.adapter = adapter
+            binding.progressBarAroundWifiResultsDate.visibility = View.GONE
         })
 
         binding.imageViewBackButtonAroundWifiResultsDate.setOnClickListener { finish() }

@@ -3,6 +3,7 @@ package com.wifianalyzer.wifianalyzerproject.ui.activity
 import android.content.SharedPreferences
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.View
 import androidx.activity.viewModels
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -28,12 +29,15 @@ class AroundWifiResultsList : AppCompatActivity() {
 
         val unixtimestamp = intent.getStringExtra("unixtimestamp")!!.toLong()
 
+        binding.progressBarAroundWifiResultsList.visibility = View.VISIBLE
         viewModel.getRssiList(unixtimestamp,userKey)
         viewModel.rssiSignalList.observe(this, Observer {
             binding.recyclerViewAroundWifiResultsList.setHasFixedSize(true)
             binding.recyclerViewAroundWifiResultsList.layoutManager = LinearLayoutManager(this)
             adapter = AroundWifiResultsListAdapter(this,it)
             binding.recyclerViewAroundWifiResultsList.adapter = adapter
+            binding.progressBarAroundWifiResultsList.visibility = View.GONE
+
         })
 
         binding.imageViewBackButtonAroundWifiResultsDate.setOnClickListener { finish() }
