@@ -8,6 +8,7 @@
     android:paddingBottom="5dp">
 
     <androidx.cardview.widget.CardView
+        android:id="@+id/cardViewSavedDataInfo"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:backgroundTint="@color/creme"

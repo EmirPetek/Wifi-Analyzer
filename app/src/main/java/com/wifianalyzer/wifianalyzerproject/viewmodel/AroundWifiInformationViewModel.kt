@@ -20,7 +20,7 @@ class AroundWifiInformationViewModel : ViewModel(){
        // rssiUnixtsList = rssiSignalRepo.rssiSignalUnixtsList
     }
 
-    fun getRssiListData(unixtimestamp: List<Long>, userkey: String){
+    fun getRssiListData(unixtimestamp: Long, userkey: String){
         rssiSignalRepo.getRssiList(unixtimestamp,userkey)
       //  rssiList = rssiSignalRepo.rssiSignalList
 

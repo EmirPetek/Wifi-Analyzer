@@ -17,4 +17,5 @@
     <string name="scan_finished">Tarama işlemi sona erdi.</string>
     <string name="date_format">DD/MM/YYYY HH:MM:SS</string>
     <string name="scanning_times">Tarama Zamanları</string>
+    <string name="scanning_results">Tarama Sonuçları</string>
 </resources>

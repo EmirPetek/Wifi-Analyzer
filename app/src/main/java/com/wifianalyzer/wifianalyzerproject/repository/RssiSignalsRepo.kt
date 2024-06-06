@@ -53,14 +53,13 @@ class RssiSignalsRepo : rssiSignalRepoFunctions{
         })
     }
 
-    override fun getRssiList(unixtimestamp: List<Long>, userkey: String){
+    override fun getRssiList(unixtimestamp: Long, userkey: String){
         val dataList: ArrayList<RssiSignalData> = arrayListOf()
         val database = FirebaseDatabase.getInstance()
         val rssiSignalRef = database.getReference("rssiSignals")
 
-        for (ux in unixtimestamp) {
-            val currentUnixData = ux.toString()
-            rssiSignalRef.child(userkey).child(currentUnixData).get()
+
+            rssiSignalRef.child(userkey).child(unixtimestamp.toString()).get()
                 .addOnSuccessListener { snapshot: DataSnapshot ->
                     if (snapshot.exists()) {
                         for (dataSnapshot in snapshot.children) {
@@ -73,7 +72,7 @@ class RssiSignalsRepo : rssiSignalRepoFunctions{
                         Log.e("snapshot state: ", "snapshot does not exist")
                     }
                 }
-        }
+     //   }*/
 
        /* val dataList : ArrayList<RssiSignalData> = arrayListOf()
         val size = unixtimestamp.size

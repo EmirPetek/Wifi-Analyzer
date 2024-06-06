@@ -37,6 +37,7 @@ class AroundWifiResultsDate : AppCompatActivity() {
             binding.recyclerViewAroundWifiResultsDate.adapter = adapter
         })
 
+        binding.imageViewBackButtonAroundWifiResultsDate.setOnClickListener { finish() }
 
 
 
