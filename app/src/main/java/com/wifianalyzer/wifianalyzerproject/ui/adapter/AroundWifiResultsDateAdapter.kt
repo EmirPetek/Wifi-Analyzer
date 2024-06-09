@@ -2,23 +2,29 @@ package com.wifianalyzer.wifianalyzerproject.ui.adapter
 
 import android.content.Context
 import android.content.Intent
-import android.hardware.ConsumerIrManager.CarrierFrequencyRange
-import android.net.wifi.ScanResult
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
+import android.widget.EditText
+import android.widget.ImageButton
+import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.cardview.widget.CardView
 import androidx.recyclerview.widget.RecyclerView
 import com.wifianalyzer.wifianalyzerproject.R
 import com.wifianalyzer.wifianalyzerproject.ui.activity.AroundWifiResultsList
+import com.wifianalyzer.wifianalyzerproject.viewmodel.AroundWifiResultsDateViewModel
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
-import javax.security.auth.login.LoginException
 
-class AroundWifiResultsDateAdapter(var context: Context, var result : List<Long>)
+class AroundWifiResultsDateAdapter(
+    var context: Context,
+    var result: List<Long>,)
     : RecyclerView.Adapter<AroundWifiResultsDateAdapter.CardViewObjHolder>() {
 
     class CardViewObjHolder(view : View) : RecyclerView.ViewHolder(view){
@@ -47,6 +53,9 @@ class AroundWifiResultsDateAdapter(var context: Context, var result : List<Long>
            intent.putExtra("unixtimestamp",result[position].toString())
            context.startActivity(intent)
         }
+
+
+
     }
 
 
@@ -60,5 +69,7 @@ class AroundWifiResultsDateAdapter(var context: Context, var result : List<Long>
         // Tarihi belirtilen formata göre biçimlendir
         return dateFormat.format(date)
     }
+
+
 
 }

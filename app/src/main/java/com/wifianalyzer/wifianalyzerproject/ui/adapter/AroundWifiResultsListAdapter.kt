@@ -5,12 +5,27 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
+import android.widget.EditText
+import android.widget.ImageButton
 import android.widget.TextView
+import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.RecyclerView
 import com.wifianalyzer.wifianalyzerproject.R
+import com.wifianalyzer.wifianalyzerproject.data.DevicesData
 import com.wifianalyzer.wifianalyzerproject.data.RssiSignalData
+import com.wifianalyzer.wifianalyzerproject.viewmodel.AroundWifiResultsListViewModel
 
-class AroundWifiResultsListAdapter(var context: Context, var result : List<RssiSignalData>)
+class AroundWifiResultsListAdapter(
+    var mContext: Context,
+    var result: List<RssiSignalData>,
+    var viewModel: AroundWifiResultsListViewModel,
+    private val lifecycleOwner: LifecycleOwner
+
+)
     : RecyclerView.Adapter<AroundWifiResultsListAdapter.CardViewObjHolder>()  {
 
     class CardViewObjHolder(view : View) : RecyclerView.ViewHolder(view){
@@ -18,6 +33,8 @@ class AroundWifiResultsListAdapter(var context: Context, var result : List<RssiS
         var textViewBSSID: TextView = view.findViewById(R.id.textViewAroundWifiDBBSSID)
         var textViewLocation: TextView = view.findViewById(R.id.textViewAroundWifiDBLocation)
         var textViewLevel: TextView = view.findViewById(R.id.textViewAroundWifiDBLevel)
+        var imageButtonEditWifiResult: ImageButton = view.findViewById(R.id.imageButtonEditWifiResult)
+
     }
 
     override fun onCreateViewHolder(
@@ -25,7 +42,7 @@ class AroundWifiResultsListAdapter(var context: Context, var result : List<RssiS
         viewType: Int
     ): AroundWifiResultsListAdapter.CardViewObjHolder {
         val view =
-            LayoutInflater.from(context).inflate(R.layout.card_around_wifi_db_result,parent,false)
+            LayoutInflater.from(mContext).inflate(R.layout.card_around_wifi_db_result,parent,false)
         return AroundWifiResultsListAdapter.CardViewObjHolder(view)
     }
 
@@ -54,8 +71,100 @@ class AroundWifiResultsListAdapter(var context: Context, var result : List<RssiS
         holder.textViewLevel.text = "Level: $level dBm"
         holder.textViewLocation.text = "Location: $location"
 
+        val objData = pos
+
+        holder.imageButtonEditWifiResult.setOnClickListener {
+            showAlertDialog(objData)
+        }
+
+
 
     }
+
+
+    fun showAlertDialog(objData: RssiSignalData) {
+
+        val builder = AlertDialog.Builder(mContext)
+        val view = LayoutInflater.from(mContext).inflate(R.layout.alert_edit_device, null)
+        builder.setView(view)
+
+        val dialog = builder.create()
+
+        val ssidEditText = view.findViewById<EditText>(R.id.editTextEditDeviceSSID)
+        val bssidEditText = view.findViewById<EditText>(R.id.editTextEditDeviceBSSID)
+        val nicknameEditText = view.findViewById<EditText>(R.id.editTextEditDeviceNickname)
+        val btnAdd = view.findViewById<Button>(R.id.buttonAlertEditDeviceAdd)
+        val btnCancel = view.findViewById<Button>(R.id.buttonAlertEditDeviceCancel)
+        val btnDelete = view.findViewById<Button>(R.id.buttonAlertEditDeviceDelete)
+
+
+        ssidEditText.setText(objData.ssid)
+        bssidEditText.setText(objData.bssid)
+
+       /* viewModel.getIsDeviceSavedState(objData.userkey!!, objData.bssid!!)
+        viewModel.deviceFoundData.observe(lifecycleOwner, Observer {
+            var nodeKey = it
+            Log.e("nodekey", it.toString())
+            if (nodeKey == null){
+
+                val textEdittextNickname = nicknameEditText.text.toString()
+
+                val device = DevicesData(
+                    objData.userkey!!,
+                    System.currentTimeMillis(),
+                    "0",
+                    null,
+                    objData.ssid!!,
+                    objData.bssid!!,
+                    textEdittextNickname
+                )
+
+                btnAdd.setOnClickListener {
+                    viewModel.insertDevice(device)
+                    Toast.makeText(mContext,mContext.getString(R.string.device_added), Toast.LENGTH_SHORT).show()
+                    dialog.dismiss()
+                }
+
+            }else{
+                nodeKey = nodeKey.substring(1)
+                viewModel.getDeviceData(objData.userkey,nodeKey)
+                viewModel.deviceData.observe(lifecycleOwner, Observer {
+                    bssidEditText.setText(it.nickname)
+                })
+
+
+                /*
+
+                sıralama farklı geliyor.
+                key okunuyor ancak sıralama farklı olduğu için okumakta problem oluyor.
+
+                logcatten oku.
+
+                 */
+
+            }
+
+        })
+*/
+
+        //ssidEditText.setText(objData.ssid)
+
+
+        btnDelete.setOnClickListener {
+            Toast.makeText(mContext,"DELETE BUTONUN", Toast.LENGTH_SHORT).show()
+        }
+
+        btnCancel.setOnClickListener {
+            dialog.dismiss()
+            Toast.makeText(mContext,mContext.getString(R.string.alert_cancel), Toast.LENGTH_SHORT).show()
+        }
+
+        dialog.show()
+
+
+
+    }
+
 
 
 }

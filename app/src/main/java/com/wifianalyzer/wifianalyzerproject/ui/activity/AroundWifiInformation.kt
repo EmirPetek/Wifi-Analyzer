@@ -131,6 +131,7 @@ class AroundWifiInformation : AppCompatActivity() {
             ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), PERMISSIONS_REQUEST_CODE_ACCESS_FINE_LOCATION)
         } else {
             manageWifiScan()
+
         }
     }
 
@@ -143,17 +144,19 @@ class AroundWifiInformation : AppCompatActivity() {
 
     private fun manageWifiScan() {
         val handler = Handler(Looper.getMainLooper())
+        unixtimestamp = System.currentTimeMillis()
 
         val task = object : TimerTask() {
             override fun run() {
                 handler.post {
                     period--
-                    unixtimestamp = System.currentTimeMillis()
                     if (period <= 0 ) {
                         timer.cancel()
                         Toast.makeText(applicationContext,getString(R.string.scan_finished),Toast.LENGTH_SHORT).show()
+                        binding.buttonStartScan.setText(getString(R.string.start_scan))
                     } else {
                         startWifiScan()
+
                     }
                 }
             }

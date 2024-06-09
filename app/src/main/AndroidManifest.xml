@@ -20,6 +20,9 @@
         android:theme="@style/Theme.WifiAnalyzerProject"
         tools:targetApi="31">
         <activity
+            android:name=".ui.activity.EditDeviceNickname"
+            android:exported="false" />
+        <activity
             android:name=".ui.activity.AroundWifiResultsList"
             android:exported="false" />
         <activity

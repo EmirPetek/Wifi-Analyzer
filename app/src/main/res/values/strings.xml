@@ -5,7 +5,12 @@
     <string name="start_scan">TARAMAYI BAŞLAT</string>
     <string name="ok">TAMAM</string>
     <string name="cancel">İPTAL ET</string>
-
+    <string name="ssid">SSID</string>
+    <string name="bssid">BSSID</string>
+    <string name="nickname">Nickname</string>
+    <string name="delete">SİL</string>
+    <string name="add">EKLE</string>
+    <string name="alert_cancel">İşlem iptal edildi.</string>
 
     <string name="around_wifi_information">ÇEVREDEKİ WIFI BİLGİLERİ</string>
     <string name="around_wifi_information_parameters">ÇEVREDEKİ WIFI BİLGİLERİ \n PARAMETRE GİRİNİZ</string>
@@ -13,9 +18,12 @@
     <string name="every_each_second">Kaç saniyede bir tarama yapılacak?</string>
     <string name="enter_location">Konum bilgisini giriniz?</string>
     <string name="get_around_wifi_information">Çevredeki Ağ Bilgilerini Getir</string>
-    <string name="get_current_wifi_information">Current Wifi Info</string>
+    <string name="get_current_wifi_information">Bağlı Wifi Bilgileri</string>
     <string name="scan_finished">Tarama işlemi sona erdi.</string>
     <string name="date_format">DD/MM/YYYY HH:MM:SS</string>
     <string name="scanning_times">Tarama Zamanları</string>
     <string name="scanning_results">Tarama Sonuçları</string>
+    <string name="edit_device">Cihaz Bilgisi Düzenle</string>
+    <string name="device_added">Cihaz Bilgisi Eklendi</string>
+    <string name="device_deleted">Cihaz Bilgisi Eklendi</string>
 </resources>
