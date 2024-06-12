@@ -7,7 +7,6 @@ import android.view.View
 import androidx.activity.viewModels
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.wifianalyzer.wifianalyzerproject.R
 import com.wifianalyzer.wifianalyzerproject.databinding.ActivityAroundWifiResultsListBinding
 import com.wifianalyzer.wifianalyzerproject.ui.adapter.AroundWifiResultsListAdapter
 import com.wifianalyzer.wifianalyzerproject.viewmodel.AroundWifiResultsListViewModel
@@ -34,13 +33,13 @@ class AroundWifiResultsList : AppCompatActivity() {
         viewModel.rssiSignalList.observe(this, Observer {
             binding.recyclerViewAroundWifiResultsList.setHasFixedSize(true)
             binding.recyclerViewAroundWifiResultsList.layoutManager = LinearLayoutManager(this)
-            adapter = AroundWifiResultsListAdapter(this,it)
+            adapter = AroundWifiResultsListAdapter(this,it,viewModel,this)
             binding.recyclerViewAroundWifiResultsList.adapter = adapter
             binding.progressBarAroundWifiResultsList.visibility = View.GONE
 
         })
 
-        binding.imageViewBackButtonAroundWifiResultsDate.setOnClickListener { finish() }
+        binding.imageViewBackButtonAroundWifiResultsList.setOnClickListener { finish() }
 
 
 

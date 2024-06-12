@@ -26,7 +26,7 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <ImageView
-            android:id="@+id/imageViewBackButtonAroundWifiResultsDate"
+            android:id="@+id/imageViewBackButtonAroundWifiResultsList"
             android:layout_width="35dp"
             android:layout_height="35dp"
             android:layout_marginStart="8dp"
@@ -48,7 +48,7 @@
             android:textColor="#000000"
             android:textSize="16sp"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/imageViewBackButtonAroundWifiResultsDate"
+            app:layout_constraintStart_toEndOf="@+id/imageViewBackButtonAroundWifiResultsList"
             app:layout_constraintTop_toTopOf="parent" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
