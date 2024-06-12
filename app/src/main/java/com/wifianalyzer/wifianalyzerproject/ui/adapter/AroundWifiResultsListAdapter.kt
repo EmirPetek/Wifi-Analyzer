@@ -101,10 +101,10 @@ class AroundWifiResultsListAdapter(
         ssidEditText.setText(objData.ssid)
         bssidEditText.setText(objData.bssid)
 
-       /* viewModel.getIsDeviceSavedState(objData.userkey!!, objData.bssid!!)
+        viewModel.getIsDeviceSavedState(objData.userkey!!, objData.bssid!!)
         viewModel.deviceFoundData.observe(lifecycleOwner, Observer {
             var nodeKey = it
-            Log.e("nodekey", it.toString())
+            Log.e("nodekey viewmodelin birinci içi", it.toString())
             if (nodeKey == null){
 
                 val textEdittextNickname = nicknameEditText.text.toString()
@@ -126,26 +126,17 @@ class AroundWifiResultsListAdapter(
                 }
 
             }else{
-                nodeKey = nodeKey.substring(1)
                 viewModel.getDeviceData(objData.userkey,nodeKey)
                 viewModel.deviceData.observe(lifecycleOwner, Observer {
-                    bssidEditText.setText(it.nickname)
+                    nicknameEditText.setText(it.nickname)
+                    bssidEditText.setText(it.bssid)
+                    Log.e("ikinci viewmodel içinde", it.toString())
                 })
-
-
-                /*
-
-                sıralama farklı geliyor.
-                key okunuyor ancak sıralama farklı olduğu için okumakta problem oluyor.
-
-                logcatten oku.
-
-                 */
 
             }
 
         })
-*/
+
 
         //ssidEditText.setText(objData.ssid)
 

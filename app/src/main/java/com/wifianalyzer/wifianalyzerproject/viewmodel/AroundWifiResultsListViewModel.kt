@@ -1,6 +1,7 @@
 package com.wifianalyzer.wifianalyzerproject.viewmodel
 
 import android.util.Log
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.wifianalyzer.wifianalyzerproject.data.DevicesData
@@ -15,7 +16,7 @@ class AroundWifiResultsListViewModel : ViewModel() {
 
     private val repoDevicesData = DevicesRepo()
     lateinit var deviceData : MutableLiveData<DevicesData> //= repoDevicesData.deviceData
-    var deviceFoundData : MutableLiveData<String> = MutableLiveData()//= repoDevicesData.deviceData
+    var deviceFoundData : LiveData<String> = repoDevicesData.deviceSaveKey
 
     fun getRssiList(unixtimestamp:Long,userkey:String){
         repoRssiSignal.getRssiList(unixtimestamp,userkey)
@@ -26,14 +27,15 @@ class AroundWifiResultsListViewModel : ViewModel() {
     }
 
     fun getIsDeviceSavedState(userkey: String, bssid:String){
-        val state = repoDevicesData.checkIsDeviceSaved(userkey,bssid)
-        deviceFoundData.value = state
+        repoDevicesData.checkIsDeviceSaved(userkey,bssid)
+      //  Log.e("device save viewmodel nodekey -> ", state )
+       // deviceFoundData.value = state
     }
 
     fun getDeviceData(userkey: String, nodeKey:String){
         repoDevicesData.getDeviceData(userkey,nodeKey)
         deviceData = repoDevicesData.deviceData
-        Log.e("KJFSDLKJFS", deviceData.value.toString())
+        Log.e("getDevide", deviceData.value.toString())
     }
 
 
