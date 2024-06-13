@@ -1,7 +1,6 @@
 package com.wifianalyzer.wifianalyzerproject.repository
 
 import android.util.Log
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -31,17 +30,18 @@ class DevicesRepo {
             override fun onDataChange(snapshot: DataSnapshot) {
                 if (snapshot.exists()){
                     for (i in snapshot.children){
-                      //  Log.e("devicesave i ", i.toString())
+                        Log.e("devicesave i ", i.toString())
                         var data = i.getValue(DevicesData::class.java)!!
 
-                        if (data.bssid == bssid){
-                            nodeKey = i.key!!
-                            deviceSaveKey.value = i.key!!
-                        //    Log.e("birinci metod", "if içi $nodeKey")
-                        }
+                            if (data.bssid == bssid) {
+                                nodeKey = i.key!!
+                                deviceSaveKey.value = i.key!!
+                                Log.e("birinci metod", "if içi $nodeKey")
+                            }
                     }
                 }else{
-                 //   Log.e("devicesrepo", "snapshot  yokkk briicni metod")
+                    deviceSaveKey.value = "null"
+                   Log.e("devicesrepo", "snapshot  yokkk briicni metod")
                 }
             }
 
@@ -65,11 +65,12 @@ class DevicesRepo {
                     if (snapshot.exists()){
                         for (i in snapshot.children){
                             var data = i.getValue(DevicesData::class.java)!!
-                            nesne = data
+                                nesne = data
+
                         }
                     }else{
-//                        Log.e("devicesrepo", "snapshot yokk getDeviceData func")
-//                        Log.e("devicesrepo", nodeKey.toString())
+                        Log.e("devicesrepo", "snapshot yokk getDeviceData func")
+                        Log.e("devicesrepo", nodeKey.toString())
                     }
                     deviceData.value = nesne
                 }
@@ -79,10 +80,13 @@ class DevicesRepo {
                 }
 
             })
-
-
-
-
     }
 
+    fun updateDeviceNickname(userkey: String,nodeKey: String,device: Map<String,String>){
+        dbRef.child(userkey).child(nodeKey).updateChildren(device)
+    }
+
+    fun deleteDevice(userkey: String, nodeKey: String, device: Map<String, Any>){
+        dbRef.child(userkey).child(nodeKey).removeValue()
+    }
 }

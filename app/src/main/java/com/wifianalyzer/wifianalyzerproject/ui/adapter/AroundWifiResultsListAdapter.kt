@@ -14,6 +14,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.snackbar.Snackbar
 import com.wifianalyzer.wifianalyzerproject.R
 import com.wifianalyzer.wifianalyzerproject.data.DevicesData
 import com.wifianalyzer.wifianalyzerproject.data.RssiSignalData
@@ -101,36 +102,90 @@ class AroundWifiResultsListAdapter(
         ssidEditText.setText(objData.ssid)
         bssidEditText.setText(objData.bssid)
 
+        Log.e("alert içi", "viewmodel öncesi")
+
+
         viewModel.getIsDeviceSavedState(objData.userkey!!, objData.bssid!!)
         viewModel.deviceFoundData.observe(lifecycleOwner, Observer {
+
             var nodeKey = it
-            Log.e("nodekey viewmodelin birinci içi", it.toString())
-            if (nodeKey == null){
+            Log.e("viewmodel içindekilier", "nodekey -> $nodeKey")
 
-                val textEdittextNickname = nicknameEditText.text.toString()
-
-                val device = DevicesData(
-                    objData.userkey!!,
-                    System.currentTimeMillis(),
-                    "0",
-                    null,
-                    objData.ssid!!,
-                    objData.bssid!!,
-                    textEdittextNickname
-                )
-
+            if (nodeKey == null || nodeKey == "null"){ /// CİHAZ NICKNAME BİLGİSİ KAYDEDİLMEMİŞ İSE ÇALIŞAN KISIM
+                Log.e("viewmodel içindekilier", "nodekey null")
                 btnAdd.setOnClickListener {
-                    viewModel.insertDevice(device)
-                    Toast.makeText(mContext,mContext.getString(R.string.device_added), Toast.LENGTH_SHORT).show()
-                    dialog.dismiss()
+
+                    val textEdittextNickname = nicknameEditText.text.toString()
+
+
+                    if (textEdittextNickname.isEmpty()){
+                        Toast.makeText(mContext,mContext.getString(R.string.cannot_be_nickname_empty),Toast.LENGTH_SHORT).show()
+                    }else {
+                        val device = DevicesData(
+                            objData.userkey!!,
+                            System.currentTimeMillis(),
+                            "0",
+                            0,
+                            objData.ssid!!,
+                            objData.bssid!!,
+                            textEdittextNickname
+                        )
+
+                        Log.e("viewmodel içindekilier", "btnAdd")
+                        viewModel.insertDevice(device)
+                        Toast.makeText(
+                            mContext,
+                            mContext.getString(R.string.device_added),
+                            Toast.LENGTH_SHORT
+                        ).show()
+                        dialog.dismiss()
+                    }
                 }
 
-            }else{
+            }else{   /// CİHAZ NICKNAME BİLGİSİ KAYITLI OLDUĞU ZAMAN ÇALIŞAN KISIM
+                btnDelete.visibility = View.VISIBLE
                 viewModel.getDeviceData(objData.userkey,nodeKey)
                 viewModel.deviceData.observe(lifecycleOwner, Observer {
                     nicknameEditText.setText(it.nickname)
                     bssidEditText.setText(it.bssid)
-                    Log.e("ikinci viewmodel içinde", it.toString())
+                    Log.e("viewmodel içindekilier", "else kısmında vm içi ve it: $it")
+
+                    btnAdd.setText(mContext.getString(R.string.update))
+
+                        btnAdd.setOnClickListener {
+                            if (nicknameEditText.text.toString().isEmpty()){
+                                Toast.makeText(mContext,mContext.getString(R.string.cannot_be_nickname_empty),Toast.LENGTH_SHORT).show()
+                            }else {
+                                val update = mapOf(
+                                    "nickname" to nicknameEditText.text.toString(),
+                                )
+                                viewModel.updateDeviceNickname(objData.userkey, nodeKey, update)
+                                Toast.makeText(
+                                    mContext,
+                                    mContext.getString(R.string.device_updated),
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                                dialog.dismiss()
+                            }
+                        }
+
+
+                    btnDelete.setOnClickListener{
+
+                        Snackbar.make(btnDelete,mContext.getString(R.string.are_you_sure_to_delete),Snackbar.LENGTH_SHORT)
+                            .setAction(mContext.getString(R.string.delete)){
+                                val delete = mapOf(
+                                    "deleteState" to "1",
+                                    "deleteTime" to System.currentTimeMillis()
+                                )
+                                viewModel.deleteDevice(objData.userkey,nodeKey, delete)
+                                Toast.makeText(mContext,mContext.getString(R.string.device_deleted),Toast.LENGTH_SHORT).show()
+                                dialog.dismiss()
+                            }.show()
+
+                    }
+
+
                 })
 
             }
@@ -140,10 +195,10 @@ class AroundWifiResultsListAdapter(
 
         //ssidEditText.setText(objData.ssid)
 
-
-        btnDelete.setOnClickListener {
+            btnDelete.visibility = View.GONE
+      /*  btnDelete.setOnClickListener {
             Toast.makeText(mContext,"DELETE BUTONUN", Toast.LENGTH_SHORT).show()
-        }
+        }*/
 
         btnCancel.setOnClickListener {
             dialog.dismiss()

@@ -38,6 +38,14 @@ class AroundWifiResultsListViewModel : ViewModel() {
         Log.e("getDevide", deviceData.value.toString())
     }
 
+    fun updateDeviceNickname(userkey: String,nodeKey: String,device: Map<String,String>){
+        repoDevicesData.updateDeviceNickname(userkey,nodeKey, device)
+    }
+
+    fun deleteDevice(userkey: String,nodeKey: String,device: Map<String,Any>) {
+        repoDevicesData.deleteDevice(userkey, nodeKey, device)
+    }
+
 
 
 }
