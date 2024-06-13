@@ -31,9 +31,8 @@ class DevicesRepo {
                 if (snapshot.exists()){
                     for (i in snapshot.children){
                         Log.e("devicesave i ", i.toString())
-                        var data = i.getValue(DevicesData::class.java)!!
-
-                            if (data.bssid == bssid) {
+                        val data = i.getValue(DevicesData::class.java)!!
+                        if (data.bssid == bssid) {
                                 nodeKey = i.key!!
                                 deviceSaveKey.value = i.key!!
                                 Log.e("birinci metod", "if içi $nodeKey")
