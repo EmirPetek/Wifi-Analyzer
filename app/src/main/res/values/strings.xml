@@ -10,6 +10,7 @@
     <string name="nickname">Nickname</string>
     <string name="delete">SİL</string>
     <string name="add">EKLE</string>
+    <string name="update">GÜNCELLE</string>
     <string name="alert_cancel">İşlem iptal edildi.</string>
 
     <string name="around_wifi_information">ÇEVREDEKİ WIFI BİLGİLERİ</string>
@@ -24,6 +25,9 @@
     <string name="scanning_times">Tarama Zamanları</string>
     <string name="scanning_results">Tarama Sonuçları</string>
     <string name="edit_device">Cihaz Bilgisi Düzenle</string>
-    <string name="device_added">Cihaz Bilgisi Eklendi</string>
-    <string name="device_deleted">Cihaz Bilgisi Eklendi</string>
+    <string name="device_added">Cihaz Bilgisi Eklendi.</string>
+    <string name="device_deleted">Cihaz Bilgisi Silindi.</string>
+    <string name="device_updated">Cihaz Bilgisi Güncellendi.</string>
+    <string name="are_you_sure_to_delete">Cihaz bilgisini silmek istediğinizden emin misiniz?</string>
+    <string name="cannot_be_nickname_empty">Nickname kısmı boş geçilemez.</string>
 </resources>

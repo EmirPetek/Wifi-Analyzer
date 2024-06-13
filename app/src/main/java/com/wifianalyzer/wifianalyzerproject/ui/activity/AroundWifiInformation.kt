@@ -50,7 +50,7 @@ class AroundWifiInformation : AppCompatActivity() {
     private var location = ""
     private var isStartedScan = 0 // 0 hiç başlatılmamış / durdurulmuş halde, 1 başlatılmış
     var timer = Timer()
-    var unixtimestamp : Long = 0
+    var unixtimestamp : Long = System.currentTimeMillis()
     private  var rssiSignalList: List<RssiSignalData> = mutableListOf()
     private  var rssiSignalUnixTsList: List<Long> = mutableListOf()
 
@@ -144,13 +144,14 @@ class AroundWifiInformation : AppCompatActivity() {
 
     private fun manageWifiScan() {
         val handler = Handler(Looper.getMainLooper())
-        unixtimestamp = System.currentTimeMillis()
+        //unixtimestamp = System.currentTimeMillis()
 
         val task = object : TimerTask() {
             override fun run() {
                 handler.post {
                     period--
                     if (period <= 0 ) {
+                        //unixtimestamp = System.currentTimeMillis()
                         timer.cancel()
                         Toast.makeText(applicationContext,getString(R.string.scan_finished),Toast.LENGTH_SHORT).show()
                         binding.buttonStartScan.setText(getString(R.string.start_scan))
@@ -196,7 +197,7 @@ class AroundWifiInformation : AppCompatActivity() {
                     System.currentTimeMillis(),
                     userKey
                 )
-            viewModel.insertRssiSignal(rssiObjList,userKey, unixtimestamp)
+            viewModel.insertRssiSignal(rssiObjList,userKey, System.currentTimeMillis())
         }
 
         Log.e("rssi verileri: ", rssiObjList.toString())
