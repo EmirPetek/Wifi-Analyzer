@@ -4,7 +4,7 @@
         <!-- Customize your dark theme here. -->
         <!-- <item name="colorPrimary">@color/my_dark_primary</item> -->
 
-        <item name="colorPrimaryDark">#FF5B4D</item>
+        <item name="colorPrimaryDark">@color/statusBarColor</item>
 
     </style>
 </resources>

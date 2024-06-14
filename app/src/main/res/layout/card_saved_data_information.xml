@@ -11,7 +11,7 @@
         android:id="@+id/cardViewSavedDataInfo"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:backgroundTint="@color/creme"
+        android:backgroundTint="@color/card_unixtime"
         app:cardCornerRadius="10dp">
 
         <androidx.constraintlayout.widget.ConstraintLayout

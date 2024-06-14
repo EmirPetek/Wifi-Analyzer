@@ -4,5 +4,10 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
     <color name="creme">#FFF5EA</color>
-    <color name="background_pink">#FF8A80</color>
+    <color name="background_pink">#EFD2CB</color>
+    <color name="background_pink_toolbar">#E3B0A4</color>
+    <color name="card_info">#CBE8EF</color>
+    <color name="btn_mainactivity">#CBE8EF</color>
+    <color name="statusBarColor">#EFD2CB"</color>
+    <color name="card_unixtime">#FFF5EA</color>
 </resources>
