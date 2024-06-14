@@ -3,7 +3,7 @@
     <style name="Base.Theme.WifiAnalyzerProject" parent="Theme.Material3.DayNight.NoActionBar">
         <!-- Customize your light theme here. -->
         <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
-    <item name="colorPrimaryDark">#FF5B4D</item>
+    <item name="colorPrimaryDark">@color/statusBarColor</item>
 
     </style>
 
