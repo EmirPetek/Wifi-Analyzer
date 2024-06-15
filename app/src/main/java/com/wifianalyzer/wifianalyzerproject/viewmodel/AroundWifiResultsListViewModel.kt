@@ -29,13 +29,13 @@ class AroundWifiResultsListViewModel : ViewModel() {
     fun getIsDeviceSavedState(userkey: String, bssid:String){
         repoDevicesData.checkIsDeviceSaved(userkey,bssid)
       //  Log.e("device save viewmodel nodekey -> ", state )
-       // deviceFoundData.value = state
+          //deviceFoundData.value = state
     }
 
     fun getDeviceData(userkey: String, nodeKey:String){
         repoDevicesData.getDeviceData(userkey,nodeKey)
         deviceData = repoDevicesData.deviceData
-        Log.e("getDevide", deviceData.value.toString())
+       // Log.e("getDevide", deviceData.value.toString())
     }
 
     fun updateDeviceNickname(userkey: String,nodeKey: String,device: Map<String,String>){

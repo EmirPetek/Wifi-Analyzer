@@ -30,17 +30,21 @@ class DevicesRepo {
             override fun onDataChange(snapshot: DataSnapshot) {
                 if (snapshot.exists()){
                     for (i in snapshot.children){
-                        Log.e("devicesave i ", i.toString())
+                      //  Log.e("dbde kayıtlı cihaz in repo class ", i.toString())
                         val data = i.getValue(DevicesData::class.java)!!
                         if (data.bssid == bssid) {
                                 nodeKey = i.key!!
                                 deviceSaveKey.value = i.key!!
-                                Log.e("birinci metod", "if içi $nodeKey")
+                              //  Log.e("birinci metod", "if içi $nodeKey")
+
                             }
+                        else{
+                            deviceSaveKey.value = "null"
+                        }
                     }
                 }else{
                     deviceSaveKey.value = "null"
-                   Log.e("devicesrepo", "snapshot  yokkk briicni metod")
+                   //Log.e("devicesrepo", "snapshot  yokkk briicni metod")
                 }
             }
 
@@ -57,14 +61,17 @@ class DevicesRepo {
     fun getDeviceData(userkey: String, nodeKey:String){
         dbRef
             .child(userkey)
-            .orderByChild(nodeKey)
             .addListenerForSingleValueEvent(object : ValueEventListener{
                 override fun onDataChange(snapshot: DataSnapshot) {
                     var nesne = DevicesData()
                     if (snapshot.exists()){
                         for (i in snapshot.children){
-                            var data = i.getValue(DevicesData::class.java)!!
+                            val data = i.getValue(DevicesData::class.java)!!
+
+                            if (data.bssid == nodeKey){
                                 nesne = data
+                                data.nodeKey = i.key!!
+                            }
 
                         }
                     }else{
