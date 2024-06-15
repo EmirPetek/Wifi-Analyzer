@@ -7,7 +7,8 @@ data class DevicesData(
     val deleteTime:Long? = null,
     val ssid:String,
     val bssid:String,
-    val nickname:String? = null
+    val nickname:String? = null,
+    var nodeKey:String? = null
 ){
 
     constructor() : this("",0,"",0,"","","")

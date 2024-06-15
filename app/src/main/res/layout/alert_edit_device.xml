@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -7,11 +7,30 @@
     android:orientation="vertical">
 
     <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/CLprogressBarAlertEditDevice"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ProgressBar
+            android:id="@+id/progressBarAlertEditDevice"
+            style="?android:attr/progressBarStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/constraintLayoutAlertEditDevice"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="#FFFFFF"
-        tools:layout_editor_absoluteX="0dp"
-        tools:layout_editor_absoluteY="52dp">
+        android:background="#FFFFFF">
 
         <TextView
             android:id="@+id/textViewAlertEditDeviceSSID"
@@ -52,28 +71,31 @@
 
         <EditText
             android:id="@+id/editTextEditDeviceSSID"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="24dp"
+            android:layout_marginEnd="24dp"
             android:clickable="true"
             android:contextClickable="false"
             android:cursorVisible="false"
             android:ems="10"
             android:focusable="false"
             android:hint="@string/ssid"
-            android:inputType="text"
 
+            android:inputType="text"
             android:textColor="#000000"
             android:textColorHint="#776868"
             app:layout_constraintBottom_toBottomOf="@+id/textViewAlertEditDeviceSSID"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/textViewAlertEditDeviceSSID"
             app:layout_constraintTop_toTopOf="@+id/textViewAlertEditDeviceSSID" />
 
         <EditText
             android:id="@+id/editTextEditDeviceBSSID"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="24dp"
+            android:layout_marginEnd="24dp"
             android:clickable="true"
             android:contextClickable="false"
             android:cursorVisible="false"
@@ -84,20 +106,23 @@
             android:textColor="#000000"
             android:textColorHint="#776868"
             app:layout_constraintBottom_toBottomOf="@+id/textViewAlertEditDeviceBSSID"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/textViewAlertEditDeviceBSSID"
             app:layout_constraintTop_toTopOf="@+id/textViewAlertEditDeviceBSSID" />
 
         <EditText
             android:id="@+id/editTextEditDeviceNickname"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="24dp"
+            android:layout_marginEnd="24dp"
             android:ems="10"
             android:hint="@string/nickname"
             android:inputType="text"
             android:textColor="#000000"
             android:textColorHint="#776868"
             app:layout_constraintBottom_toBottomOf="@+id/textViewAlertEditDeviceNickname"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/textViewAlertEditDeviceNickname"
             app:layout_constraintTop_toTopOf="@+id/textViewAlertEditDeviceNickname" />
 
@@ -108,7 +133,7 @@
             android:layout_marginStart="24dp"
             android:layout_marginTop="16dp"
             android:layout_marginBottom="16dp"
-            android:backgroundTint="#00FA0D"
+            android:backgroundTint="#28A745"
             android:clickable="false"
             android:contextClickable="false"
             android:text="@string/add"
@@ -125,7 +150,7 @@
             android:layout_marginTop="16dp"
             android:layout_marginEnd="24dp"
             android:layout_marginBottom="16dp"
-            android:backgroundTint="#FF9E80"
+            android:backgroundTint="#007BFF "
             android:text="@string/cancel"
             android:textColor="#FFFFFF"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -140,11 +165,11 @@
             android:layout_marginStart="32dp"
             android:layout_marginTop="16dp"
             android:layout_marginEnd="32dp"
-            android:backgroundTint="#FF0000"
+            android:backgroundTint="#DC3545"
             android:text="@string/delete"
             android:textColor="#FFFFFF"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/editTextEditDeviceNickname" />
     </androidx.constraintlayout.widget.ConstraintLayout>
-</LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>
