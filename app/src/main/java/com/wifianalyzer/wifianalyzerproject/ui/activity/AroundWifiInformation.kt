@@ -150,8 +150,9 @@ class AroundWifiInformation : AppCompatActivity() {
             override fun run() {
                 handler.post {
                     period--
+                    unixtimestamp = System.currentTimeMillis()
                     if (period <= 0 ) {
-                        //unixtimestamp = System.currentTimeMillis()
+                        unixtimestamp = System.currentTimeMillis()
                         timer.cancel()
                         Toast.makeText(applicationContext,getString(R.string.scan_finished),Toast.LENGTH_SHORT).show()
                         binding.buttonStartScan.setText(getString(R.string.start_scan))
@@ -197,7 +198,7 @@ class AroundWifiInformation : AppCompatActivity() {
                     System.currentTimeMillis(),
                     userKey
                 )
-            viewModel.insertRssiSignal(rssiObjList,userKey, System.currentTimeMillis())
+            viewModel.insertRssiSignal(rssiObjList,userKey, unixtimestamp)
         }
 
         Log.e("rssi verileri: ", rssiObjList.toString())
