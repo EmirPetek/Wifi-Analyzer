@@ -68,7 +68,7 @@ class DevicesRepo {
                         for (i in snapshot.children){
                             val data = i.getValue(DevicesData::class.java)!!
 
-                            if (data.bssid == nodeKey){
+                            if (data.deleteState == "0" && data.bssid == nodeKey){
                                 nesne = data
                                 data.nodeKey = i.key!!
                             }
@@ -93,6 +93,6 @@ class DevicesRepo {
     }
 
     fun deleteDevice(userkey: String, nodeKey: String, device: Map<String, Any>){
-        dbRef.child(userkey).child(nodeKey).removeValue()
+        dbRef.child(userkey).child(nodeKey).updateChildren(device)
     }
 }
