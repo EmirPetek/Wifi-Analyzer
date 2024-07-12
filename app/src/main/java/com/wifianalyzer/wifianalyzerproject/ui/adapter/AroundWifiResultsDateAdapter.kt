@@ -6,18 +6,11 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
-import android.widget.EditText
-import android.widget.ImageButton
-import android.widget.ImageView
 import android.widget.TextView
-import android.widget.Toast
-import androidx.appcompat.app.AlertDialog
 import androidx.cardview.widget.CardView
 import androidx.recyclerview.widget.RecyclerView
 import com.wifianalyzer.wifianalyzerproject.R
-import com.wifianalyzer.wifianalyzerproject.ui.activity.AroundWifiResultsList
-import com.wifianalyzer.wifianalyzerproject.viewmodel.AroundWifiResultsDateViewModel
+import com.wifianalyzer.wifianalyzerproject.ui.activity.aroundWifiResultsList.AroundWifiResultsList
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -49,7 +42,7 @@ class AroundWifiResultsDateAdapter(
         holder.cardViewSavedDataInfo.setOnClickListener {
             Log.e("UNIXTS DEĞERİ -> ", result[position].toString())
 
-            val intent = Intent(context,AroundWifiResultsList::class.java)
+            val intent = Intent(context, AroundWifiResultsList::class.java)
            intent.putExtra("unixtimestamp",result[position].toString())
            context.startActivity(intent)
         }
