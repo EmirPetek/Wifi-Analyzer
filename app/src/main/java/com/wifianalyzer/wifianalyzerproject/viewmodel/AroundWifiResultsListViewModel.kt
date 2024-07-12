@@ -17,6 +17,8 @@ class AroundWifiResultsListViewModel : ViewModel() {
     private val repoDevicesData = DevicesRepo()
     lateinit var deviceData : MutableLiveData<DevicesData> //= repoDevicesData.deviceData
     var deviceFoundData : LiveData<String> = repoDevicesData.deviceSaveKey
+    var deviceList : LiveData<ArrayList<DevicesData>> = repoDevicesData.deviceList
+
 
     fun getRssiList(unixtimestamp:Long,userkey:String){
         repoRssiSignal.getRssiList(unixtimestamp,userkey)
@@ -36,6 +38,10 @@ class AroundWifiResultsListViewModel : ViewModel() {
         repoDevicesData.getDeviceData(userkey,nodeKey)
         deviceData = repoDevicesData.deviceData
        // Log.e("getDevide", deviceData.value.toString())
+    }
+
+    fun getDeviceList(userkey: String){
+        repoDevicesData.getDeviceList(userkey)
     }
 
     fun updateDeviceNickname(userkey: String,nodeKey: String,device: Map<String,String>){

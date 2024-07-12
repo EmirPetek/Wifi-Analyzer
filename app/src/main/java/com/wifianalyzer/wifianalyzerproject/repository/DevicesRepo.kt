@@ -12,6 +12,7 @@ class DevicesRepo {
 
     val deviceData : MutableLiveData<DevicesData> = MutableLiveData<DevicesData>()
     var deviceSaveKey : MutableLiveData<String> = MutableLiveData<String>()
+    val deviceList : MutableLiveData<ArrayList<DevicesData>> = MutableLiveData<ArrayList<DevicesData>>()
 
     val dbRef = FirebaseDatabase.getInstance().getReference("devices")
 
@@ -79,6 +80,30 @@ class DevicesRepo {
                         Log.e("devicesrepo", nodeKey.toString())
                     }
                     deviceData.value = nesne
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                    TODO("Not yet implemented")
+                }
+
+            })
+    }
+
+    fun getDeviceList(userkey: String){
+        var deviceL : ArrayList<DevicesData> = arrayListOf()
+        dbRef
+            .child(userkey)
+            .addListenerForSingleValueEvent(object : ValueEventListener{
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    if (snapshot.exists()){
+                        for (i in snapshot.children){
+                            val data = i.getValue(DevicesData::class.java)!!
+                            if (data.deleteState == "0"){
+                                deviceL.add(data)
+                            }
+                        }
+                    }
+                    deviceList.value = deviceL
                 }
 
                 override fun onCancelled(error: DatabaseError) {
