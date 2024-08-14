@@ -4,15 +4,23 @@ import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.content.SharedPreferences.Editor
+import android.content.pm.PackageManager
 import android.location.LocationManager
 import android.net.wifi.WifiManager
+import android.net.wifi.rtt.WifiRttManager
+import android.os.Build
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.widget.Button
 import androidx.appcompat.app.AlertDialog
 import android.widget.Toast
 import android.util.Log
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import com.wifianalyzer.wifianalyzerproject.databinding.ActivityMainBinding
+import com.wifianalyzer.wifianalyzerproject.repository.sensor.GetSensorData
+import com.wifianalyzer.wifianalyzerproject.repository.sensor.rtt.RTTHandler
 import com.wifianalyzer.wifianalyzerproject.ui.activity.AroundWifiInformation
 import com.wifianalyzer.wifianalyzerproject.ui.activity.AroundWifiResultsDate
 import com.wifianalyzer.wifianalyzerproject.ui.activity.CurrentWifiInformation
@@ -25,11 +33,14 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private lateinit var sharedPreferences: SharedPreferences
     private lateinit var editor: Editor
+    private lateinit var wifiRTTManagerWrapper: RTTHandler
+
 
     companion object {
         private const val PERMISSIONS_REQUEST_CODE_ACCESS_FINE_LOCATION = 1
     }
 
+    @RequiresApi(Build.VERSION_CODES.P)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
@@ -42,6 +53,14 @@ class MainActivity : AppCompatActivity() {
    //     checkLocationPermission()
 
         bindButtons()
+
+        binding.buttonGet.setOnClickListener {
+
+
+            }
+
+
+
 
         setContentView(binding.root)
 

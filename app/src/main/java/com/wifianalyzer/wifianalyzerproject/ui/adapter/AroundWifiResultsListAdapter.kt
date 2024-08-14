@@ -38,6 +38,10 @@ class AroundWifiResultsListAdapter(
         var textViewBSSID: TextView = view.findViewById(R.id.textViewAroundWifiDBBSSID)
         var textViewLocation: TextView = view.findViewById(R.id.textViewAroundWifiDBLocation)
         var textViewLevel: TextView = view.findViewById(R.id.textViewAroundWifiDBLevel)
+        var textViewAccelerometer: TextView = view.findViewById(R.id.textViewAroundWifiDBAccelerometer)
+        var textViewGyroscope: TextView = view.findViewById(R.id.textViewAroundWifiDBGyroscope)
+        var textViewWifiStandart: TextView = view.findViewById(R.id.textViewAroundWifiResultDBWifiStandart)
+        var textView802Support: TextView = view.findViewById(R.id.textViewAroundWifiResultsDB802MCSupport)
         var imageButtonEditWifiResult: ImageButton = view.findViewById(R.id.imageButtonEditWifiResult)
 
     }
@@ -68,6 +72,10 @@ class AroundWifiResultsListAdapter(
         val bssid = pos.bssid
         val level = pos.rssi
         val location = pos.location
+        val accelerometer = pos.sensorAccelerometer
+        val gyroscope = pos.sensorGyroscope
+        val wifiStandart = pos.wifiStandart
+        val mcResponder_802_11 = pos.mcResponder_802_11
 
         //Log.e("aroundwifiresultslistadapter: ", ssid!!)
 
@@ -75,6 +83,10 @@ class AroundWifiResultsListAdapter(
         holder.textViewBSSID.text = "BSSID: $bssid"
         holder.textViewLevel.text = "Level: $level dBm"
         holder.textViewLocation.text = "Location: $location"
+        holder.textViewAccelerometer.text = "$accelerometer"
+        holder.textViewGyroscope.text = "$gyroscope"
+        holder.textViewWifiStandart.text = "Wifi Standart: $wifiStandart"
+        holder.textView802Support.text = "80211mcResponder: $mcResponder_802_11"
 
         val objData = pos
 
