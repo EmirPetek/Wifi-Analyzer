@@ -30,7 +30,7 @@ class AroundWifiResultsDate : AppCompatActivity() {
         viewModel.rssiSignalUnixtsList.observe(this, Observer {
             binding.recyclerViewAroundWifiResultsDate.setHasFixedSize(true)
             binding.recyclerViewAroundWifiResultsDate.layoutManager = LinearLayoutManager(this)
-            adapter = AroundWifiResultsDateAdapter(this,it)
+            adapter = AroundWifiResultsDateAdapter(this,it.reversed())
             binding.recyclerViewAroundWifiResultsDate.adapter = adapter
             binding.progressBarAroundWifiResultsDate.visibility = View.GONE
         })
