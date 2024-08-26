@@ -12,6 +12,7 @@ class DevicesRepo {
 
     val deviceData : MutableLiveData<DevicesData> = MutableLiveData<DevicesData>()
     var deviceSaveKey : MutableLiveData<String> = MutableLiveData<String>()
+    val deviceList : MutableLiveData<ArrayList<DevicesData>> = MutableLiveData<ArrayList<DevicesData>>()
 
     val dbRef = FirebaseDatabase.getInstance().getReference("devices")
 
@@ -30,17 +31,21 @@ class DevicesRepo {
             override fun onDataChange(snapshot: DataSnapshot) {
                 if (snapshot.exists()){
                     for (i in snapshot.children){
-                        Log.e("devicesave i ", i.toString())
+                      //  Log.e("dbde kayıtlı cihaz in repo class ", i.toString())
                         val data = i.getValue(DevicesData::class.java)!!
                         if (data.bssid == bssid) {
                                 nodeKey = i.key!!
                                 deviceSaveKey.value = i.key!!
-                                Log.e("birinci metod", "if içi $nodeKey")
+                              //  Log.e("birinci metod", "if içi $nodeKey")
+
                             }
+                        else{
+                            deviceSaveKey.value = "null"
+                        }
                     }
                 }else{
                     deviceSaveKey.value = "null"
-                   Log.e("devicesrepo", "snapshot  yokkk briicni metod")
+                   //Log.e("devicesrepo", "snapshot  yokkk briicni metod")
                 }
             }
 
@@ -57,14 +62,17 @@ class DevicesRepo {
     fun getDeviceData(userkey: String, nodeKey:String){
         dbRef
             .child(userkey)
-            .orderByChild(nodeKey)
             .addListenerForSingleValueEvent(object : ValueEventListener{
                 override fun onDataChange(snapshot: DataSnapshot) {
                     var nesne = DevicesData()
                     if (snapshot.exists()){
                         for (i in snapshot.children){
-                            var data = i.getValue(DevicesData::class.java)!!
+                            val data = i.getValue(DevicesData::class.java)!!
+
+                            if (data.deleteState == "0" && data.bssid == nodeKey){
                                 nesne = data
+                                data.nodeKey = i.key!!
+                            }
 
                         }
                     }else{
@@ -81,11 +89,35 @@ class DevicesRepo {
             })
     }
 
+    fun getDeviceList(userkey: String){
+        var deviceL : ArrayList<DevicesData> = arrayListOf()
+        dbRef
+            .child(userkey)
+            .addListenerForSingleValueEvent(object : ValueEventListener{
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    if (snapshot.exists()){
+                        for (i in snapshot.children){
+                            val data = i.getValue(DevicesData::class.java)!!
+                            if (data.deleteState == "0"){
+                                deviceL.add(data)
+                            }
+                        }
+                    }
+                    deviceList.value = deviceL
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                    TODO("Not yet implemented")
+                }
+
+            })
+    }
+
     fun updateDeviceNickname(userkey: String,nodeKey: String,device: Map<String,String>){
         dbRef.child(userkey).child(nodeKey).updateChildren(device)
     }
 
     fun deleteDevice(userkey: String, nodeKey: String, device: Map<String, Any>){
-        dbRef.child(userkey).child(nodeKey).removeValue()
+        dbRef.child(userkey).child(nodeKey).updateChildren(device)
     }
 }

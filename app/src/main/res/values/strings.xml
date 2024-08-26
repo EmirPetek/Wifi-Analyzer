@@ -13,7 +13,7 @@
     <string name="update">GÜNCELLE</string>
     <string name="alert_cancel">İşlem iptal edildi.</string>
 
-    <string name="around_wifi_information">ÇEVREDEKİ WIFI BİLGİLERİ</string>
+    <string name="around_wifi_information">Çevredeki Wifi Bilgileri</string>
     <string name="around_wifi_information_parameters">ÇEVREDEKİ WIFI BİLGİLERİ \n PARAMETRE GİRİNİZ</string>
     <string name="total_time_as_min">Tarama yapılacak dakika sayısını giriniz</string>
     <string name="every_each_second">Kaç saniyede bir tarama yapılacak?</string>

@@ -10,6 +10,7 @@ import android.content.pm.PackageManager
 import android.location.LocationManager
 import android.net.wifi.ScanResult
 import android.net.wifi.WifiManager
+import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
@@ -19,6 +20,7 @@ import android.view.View
 import android.widget.Button
 import android.widget.Toast
 import androidx.activity.viewModels
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AlertDialog
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -27,8 +29,11 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.firebase.database.FirebaseDatabase
 import com.wifianalyzer.wifianalyzerproject.R
 import com.wifianalyzer.wifianalyzerproject.data.RssiSignalData
+import com.wifianalyzer.wifianalyzerproject.data.sensor.SensorAccelerometer
+import com.wifianalyzer.wifianalyzerproject.data.sensor.SensorGyroscope
 import com.wifianalyzer.wifianalyzerproject.ui.adapter.AroundWifiInformationAdapter
 import com.wifianalyzer.wifianalyzerproject.databinding.ActivityAroundWifiInformationBinding
+import com.wifianalyzer.wifianalyzerproject.repository.sensor.GetSensorData
 import com.wifianalyzer.wifianalyzerproject.viewmodel.AroundWifiInformationViewModel
 import java.util.Timer
 import java.util.TimerTask
@@ -150,8 +155,9 @@ class AroundWifiInformation : AppCompatActivity() {
             override fun run() {
                 handler.post {
                     period--
+                    unixtimestamp = System.currentTimeMillis()
                     if (period <= 0 ) {
-                        //unixtimestamp = System.currentTimeMillis()
+                        unixtimestamp = System.currentTimeMillis()
                         timer.cancel()
                         Toast.makeText(applicationContext,getString(R.string.scan_finished),Toast.LENGTH_SHORT).show()
                         binding.buttonStartScan.setText(getString(R.string.start_scan))
@@ -184,21 +190,47 @@ class AroundWifiInformation : AppCompatActivity() {
         displayScanResults(results)
     }
 
+    @RequiresApi(Build.VERSION_CODES.R)
     private fun displayScanResults(results: List<ScanResult>) {
         var rssiObjList = RssiSignalData()
         //val ssid = results.get(results.indexOf("SSID"))
-        for (it in results){
-            rssiObjList =
-                RssiSignalData(
-                    it.SSID,
-                    it.BSSID,
-                    it.level,
-                    location,
-                    System.currentTimeMillis(),
-                    userKey
-                )
-            viewModel.insertRssiSignal(rssiObjList,userKey, System.currentTimeMillis())
-        }
+        val getdata = GetSensorData(this)
+        // Sensör verilerini almak için biraz beklemelisiniz, çünkü sensör verileri hemen alınmaz.
+        // Aksi takdirde ilk değerler boş olabilir.
+        Handler(Looper.getMainLooper()).postDelayed({
+            val accelerometerData = getdata.getAccelerometerData()
+            val gyroscopeData = getdata.getGyroscopeData()
+
+            val accelerometerObj = SensorAccelerometer(accelerometerData[0],accelerometerData[1],accelerometerData[2])
+            val gyroscopeObj = SensorGyroscope(gyroscopeData[0],gyroscopeData[1],gyroscopeData[2])
+            // Verileri istediğiniz gibi işleyebilirsiniz
+            Log.e("AnotherClass", "Accelerometer - x: ${accelerometerData[0]}, y: ${accelerometerData[1]}, z: ${accelerometerData[2]}")
+            Log.e("AnotherClass", "Gyroscope - x: ${gyroscopeData[0]}, y: ${gyroscopeData[1]}, z: ${gyroscopeData[2]}")
+
+
+            for (it in results){
+                Log.e("scan result: ", it.toString())
+                Log.e("standart: ", determineStandart(it.wifiStandard))
+                rssiObjList =
+                    RssiSignalData(
+                        it.SSID,
+                        it.BSSID,
+                        it.level,
+                        location,
+                        System.currentTimeMillis(),
+                        userKey,
+                        accelerometerObj,
+                        gyroscopeObj,
+                        determineStandart(it.wifiStandard),
+                        it.is80211mcResponder.toString()
+                        )
+                viewModel.insertRssiSignal(rssiObjList,userKey, unixtimestamp)
+            }
+
+            // Sensör dinlemeyi durdurun
+            getdata.stopListening()
+        }, 1000) // 1 saniye bekleyin (sensör verilerinin toplanması için)
+
 
         Log.e("rssi verileri: ", rssiObjList.toString())
 
@@ -209,6 +241,17 @@ class AroundWifiInformation : AppCompatActivity() {
         adapter = AroundWifiInformationAdapter(this, results)
         binding.recyclerViewAroundWifi.adapter = adapter
 
+    }
+
+    fun determineStandart(standart: Int): String{
+        when(standart){
+            4 -> return "11n"
+            5 -> return "11ac"
+            6 -> return "11ax"
+            7 -> return "11ad"
+            8 -> return "11be"
+        }
+        return "11"
     }
 
     private fun showCustomAlertDialog() {

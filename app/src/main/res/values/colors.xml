@@ -8,6 +8,9 @@
     <color name="background_pink_toolbar">#E3B0A4</color>
     <color name="card_info">#CBE8EF</color>
     <color name="btn_mainactivity">#CBE8EF</color>
-    <color name="statusBarColor">#EFD2CB"</color>
+    <color name="statusBarColor">#EFD2CB</color>
     <color name="card_unixtime">#FFF5EA</color>
+    <color name="btn_green">#28A745</color>
+    <color name="btn_red">#DC3545</color>
+    <color name="btn_blue">#007BFF</color>
 </resources>
