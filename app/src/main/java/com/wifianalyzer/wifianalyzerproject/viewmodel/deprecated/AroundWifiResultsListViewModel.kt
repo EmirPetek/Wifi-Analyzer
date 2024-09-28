@@ -1,4 +1,4 @@
-package com.wifianalyzer.wifianalyzerproject.viewmodel
+package com.wifianalyzer.wifianalyzerproject.viewmodel.deprecated
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -9,6 +9,7 @@ import com.wifianalyzer.wifianalyzerproject.repository.DevicesRepo
 import com.wifianalyzer.wifianalyzerproject.repository.RssiSignalsRepo
 
 class AroundWifiResultsListViewModel : ViewModel() {
+
     private val repoRssiSignal = RssiSignalsRepo()
     var rssiSignalList : MutableLiveData<List<RssiSignalData>> = repoRssiSignal.rssiSignalList
 
@@ -22,20 +23,20 @@ class AroundWifiResultsListViewModel : ViewModel() {
         repoRssiSignal.getRssiList(unixtimestamp,userkey)
     }
 
-    fun insertDevice(device: DevicesData){
+    fun insertDevice(device:DevicesData){
         repoDevicesData.insertDevice(device)
     }
 
     fun getIsDeviceSavedState(userkey: String, bssid:String){
         repoDevicesData.checkIsDeviceSaved(userkey,bssid)
-        //  Log.e("device save viewmodel nodekey -> ", state )
-        //deviceFoundData.value = state
+      //  Log.e("device save viewmodel nodekey -> ", state )
+          //deviceFoundData.value = state
     }
 
     fun getDeviceData(userkey: String, nodeKey:String){
         repoDevicesData.getDeviceData(userkey,nodeKey)
         deviceData = repoDevicesData.deviceData
-        // Log.e("getDevide", deviceData.value.toString())
+       // Log.e("getDevide", deviceData.value.toString())
     }
 
     fun getDeviceList(userkey: String){
@@ -49,4 +50,7 @@ class AroundWifiResultsListViewModel : ViewModel() {
     fun deleteDevice(userkey: String,nodeKey: String,device: Map<String,Any>) {
         repoDevicesData.deleteDevice(userkey, nodeKey, device)
     }
+
+
+
 }

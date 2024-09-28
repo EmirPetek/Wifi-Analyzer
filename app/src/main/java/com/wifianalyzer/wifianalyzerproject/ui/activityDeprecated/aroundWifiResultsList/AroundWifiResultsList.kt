@@ -1,25 +1,16 @@
-package com.wifianalyzer.wifianalyzerproject.ui.activity.aroundWifiResultsList
+package com.wifianalyzer.wifianalyzerproject.ui.activityDeprecated.aroundWifiResultsList
 
-import android.app.Activity
 import android.content.Intent
 import android.content.SharedPreferences
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
 import androidx.activity.viewModels
-import androidx.appcompat.app.AlertDialog
-import androidx.lifecycle.Observer
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import com.wifianalyzer.wifianalyzerproject.R
 import com.wifianalyzer.wifianalyzerproject.data.DevicesData
 import com.wifianalyzer.wifianalyzerproject.data.RssiSignalData
 import com.wifianalyzer.wifianalyzerproject.databinding.ActivityAroundWifiResultsListBinding
 import com.wifianalyzer.wifianalyzerproject.ui.adapter.AroundWifiResultsListAdapter
 import com.wifianalyzer.wifianalyzerproject.ui.adapter.FilterSavedDevicesAdapter
-import com.wifianalyzer.wifianalyzerproject.viewmodel.AroundWifiResultsListViewModel
-import kotlin.properties.Delegates
+import com.wifianalyzer.wifianalyzerproject.viewmodel.deprecated.AroundWifiResultsListViewModel
 
 class AroundWifiResultsList : AppCompatActivity() {
     private val viewModel: AroundWifiResultsListViewModel by viewModels()
@@ -42,7 +33,7 @@ class AroundWifiResultsList : AppCompatActivity() {
 
         var selectedList = intent.getSerializableExtra("selectedList")  as? ArrayList<DevicesData>
 
-        if (selectedList != null) {
+        /*if (selectedList != null) {
             viewModel.getRssiList(unixtimestamp, userKey)
             viewModel.rssiSignalList.observe(this, Observer {
                 binding.recyclerViewAroundWifiResultsList.setHasFixedSize(true)
@@ -74,7 +65,7 @@ class AroundWifiResultsList : AppCompatActivity() {
                 binding.progressBarAroundWifiResultsList.visibility = View.GONE
 
             })
-        }
+        }*/
 
         binding.imageViewBackButtonAroundWifiResultsList.setOnClickListener { finish() }
 

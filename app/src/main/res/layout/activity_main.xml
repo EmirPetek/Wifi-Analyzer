@@ -7,72 +7,11 @@
     android:background="@color/background_pink"
     tools:context=".MainActivity">
 
-    <Button
-        android:id="@+id/buttonGetScanResultData"
-        android:layout_width="180dp"
-        android:layout_height="90dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
-        android:backgroundTint="@color/btn_mainactivity"
-        android:text="@string/get_around_wifi_information"
-        android:textColor="#000000"
-        android:textSize="16sp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textViewWarnLocation" />
-
-    <Button
-        android:id="@+id/buttonGetCurrentWifiInfo"
-        android:layout_width="180dp"
-        android:layout_height="90dp"
-        android:layout_marginStart="19dp"
-        android:layout_marginEnd="16dp"
-        android:backgroundTint="@color/btn_mainactivity"
-        android:text="@string/get_current_wifi_information"
-        android:textColor="#000000"
-        android:textSize="16sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/buttonGetScanResultData"
-        app:layout_constraintTop_toTopOf="@+id/buttonGetScanResultData"
-        tools:ignore="MissingConstraints" />
-
-    <TextView
-        android:id="@+id/textViewWarnLocation"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:background="@color/background_pink_toolbar"
-        android:paddingLeft="20dp"
-        android:paddingTop="10dp"
-        android:paddingRight="20dp"
-        android:text="@string/location_should_open"
-        android:textAlignment="center"
-        android:textColor="#000000"
-        android:textStyle="bold"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <Button
-        android:id="@+id/buttonGetData"
-        android:layout_width="180dp"
-        android:layout_height="90dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
-        android:backgroundTint="@color/btn_mainactivity"
-        android:text="Kaydedilmiş verileri getir"
-        android:textColor="#000000"
-        android:textSize="16sp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/buttonGetScanResultData"
-        tools:ignore="HardcodedText" />
-
-    <Button
-        android:id="@+id/buttonGet"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="17dp"
-        android:layout_marginTop="51dp"
-        android:text="Button"
-        app:layout_constraintStart_toEndOf="@+id/buttonGetData"
-        app:layout_constraintTop_toBottomOf="@+id/buttonGetCurrentWifiInfo" />
-
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/fragmentContainerView"
+        android:name="androidx.navigation.fragment.NavHostFragment"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:defaultNavHost="true"
+        app:navGraph="@navigation/nav_graph" />
 </androidx.constraintlayout.widget.ConstraintLayout>

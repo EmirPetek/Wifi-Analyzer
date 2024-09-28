@@ -1,4 +1,4 @@
-package com.wifianalyzer.wifianalyzerproject.ui.activity
+package com.wifianalyzer.wifianalyzerproject.ui.activityDeprecated
 
 import android.content.SharedPreferences
 import android.os.Bundle
@@ -9,7 +9,7 @@ import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.wifianalyzer.wifianalyzerproject.databinding.ActivityAroundWifiResultsDateBinding
 import com.wifianalyzer.wifianalyzerproject.ui.adapter.AroundWifiResultsDateAdapter
-import com.wifianalyzer.wifianalyzerproject.viewmodel.AroundWifiResultsDateViewModel
+import com.wifianalyzer.wifianalyzerproject.viewmodel.deprecated.AroundWifiResultsDateViewModel
 
 class AroundWifiResultsDate : AppCompatActivity() {
 

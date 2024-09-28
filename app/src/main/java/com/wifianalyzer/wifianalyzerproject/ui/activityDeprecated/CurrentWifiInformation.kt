@@ -1,4 +1,4 @@
-package com.wifianalyzer.wifianalyzerproject.ui.activity
+package com.wifianalyzer.wifianalyzerproject.ui.activityDeprecated
 
 import android.Manifest
 import android.content.BroadcastReceiver
@@ -21,7 +21,7 @@ class CurrentWifiInformation : AppCompatActivity() {
     private lateinit var wifiManager: WifiManager
     private lateinit var locationManager: LocationManager
     companion object {
-        private const val PERMISSIONS_REQUEST_CODE_ACCESS_FINE_LOCATION = 1
+        const val PERMISSIONS_REQUEST_CODE_ACCESS_FINE_LOCATION = 1
     }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

@@ -3,19 +3,10 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
+    android:background="@color/background_pink"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/background_pink"
-    tools:context=".ui.activityDeprecated.aroundWifiResultsList.AroundWifiResultsList">
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerViewAroundWifiResultsList"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/constraintLayout3" />
+    tools:context=".ui.fragment.aroundWifiResultsList.FilterSavedDevices">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/constraintLayout3"
@@ -27,7 +18,7 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <ImageView
-            android:id="@+id/imageViewBackButtonAroundWifiResultsList"
+            android:id="@+id/imageViewBackButtonAroundWifiResultsListFilter"
             android:layout_width="35dp"
             android:layout_height="35dp"
             android:layout_marginStart="8dp"
@@ -45,35 +36,40 @@
             android:layout_marginStart="16dp"
             android:layout_marginTop="8dp"
             android:layout_marginBottom="8dp"
-            android:text="@string/scanning_results"
+            android:text="Filtrele"
             android:textColor="#000000"
             android:textSize="20sp"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/imageViewBackButtonAroundWifiResultsList"
+            app:layout_constraintStart_toEndOf="@+id/imageViewBackButtonAroundWifiResultsListFilter"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <ImageButton
-            android:id="@+id/imageButtonFilterDataAroundWifiResults"
-            android:layout_width="45dp"
-            android:layout_height="45dp"
+        <TextView
+            android:id="@+id/textViewSaveFilterScreen"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:layout_marginEnd="16dp"
+            android:layout_marginEnd="8dp"
             android:layout_marginBottom="8dp"
-            android:background="@android:color/transparent"
+            android:clickable="true"
+            android:padding="10dp"
+            android:text="KAYDET"
+            android:textColor="#000000"
+            android:textSize="16sp"
+            android:textStyle="normal|bold"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/outline_filter_alt_24" />
+            app:layout_constraintTop_toTopOf="parent" />
+
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <ProgressBar
-        android:id="@+id/progressBarAroundWifiResultsList"
-        style="?android:attr/progressBarStyle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:visibility="invisible"
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerViewFilterScannedDevices"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="@+id/recyclerViewAroundWifiResultsList"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/constraintLayout3" />
 </androidx.constraintlayout.widget.ConstraintLayout>

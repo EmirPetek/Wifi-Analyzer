@@ -2,23 +2,22 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/background_pink"
-    tools:context=".ui.activityDeprecated.aroundWifiResultsList.AroundWifiResultsList">
+    tools:context=".ui.fragment.AroundWifiInformation">
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerViewAroundWifiResultsList"
+        android:id="@+id/recyclerViewAroundWifi"
         android:layout_width="0dp"
         android:layout_height="0dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/constraintLayout3" />
+        app:layout_constraintTop_toBottomOf="@+id/buttonStartScan" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/constraintLayout3"
+        android:id="@+id/constraintLayout2"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/background_pink_toolbar"
@@ -27,53 +26,54 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <ImageView
-            android:id="@+id/imageViewBackButtonAroundWifiResultsList"
+            android:id="@+id/imageViewBackButton"
             android:layout_width="35dp"
             android:layout_height="35dp"
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
             android:layout_marginBottom="16dp"
+            android:src="@drawable/baseline_arrow_back_ios_new_24"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/baseline_arrow_back_ios_new_24" />
+            app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
-            android:id="@+id/textView"
+            android:id="@+id/textViewAroundWifiTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
+            android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
             android:layout_marginBottom="8dp"
-            android:text="@string/scanning_results"
+            android:clickable="true"
+            android:text="@string/around_wifi_information"
             android:textColor="#000000"
             android:textSize="20sp"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/imageViewBackButtonAroundWifiResultsList"
+            app:layout_constraintStart_toEndOf="@+id/imageViewBackButton"
             app:layout_constraintTop_toTopOf="parent" />
-
-        <ImageButton
-            android:id="@+id/imageButtonFilterDataAroundWifiResults"
-            android:layout_width="45dp"
-            android:layout_height="45dp"
-            android:layout_marginTop="8dp"
-            android:layout_marginEnd="16dp"
-            android:layout_marginBottom="8dp"
-            android:background="@android:color/transparent"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/outline_filter_alt_24" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <ProgressBar
-        android:id="@+id/progressBarAroundWifiResultsList"
+        android:id="@+id/progressBarAroundWifi"
         style="?android:attr/progressBarStyle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:visibility="invisible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="@+id/recyclerViewAroundWifiResultsList"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/recyclerViewAroundWifi" />
+
+    <Button
+        android:id="@+id/buttonStartScan"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
+        android:backgroundTint="@color/btn_mainactivity"
+        android:text="@string/start_scan"
+        android:textColor="#000000"
+        app:layout_constraintBottom_toTopOf="@+id/recyclerViewAroundWifi"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/constraintLayout2" />
 </androidx.constraintlayout.widget.ConstraintLayout>
