@@ -6,7 +6,7 @@
     android:background="@color/background_pink"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.activity.aroundWifiResultsList.FilterSavedDevices">
+    tools:context=".ui.activityDeprecated.aroundWifiResultsList.FilterSavedDevices">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/constraintLayout3"

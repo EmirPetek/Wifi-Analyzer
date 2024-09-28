@@ -1,19 +1,15 @@
-package com.wifianalyzer.wifianalyzerproject.ui.activity.aroundWifiResultsList
+package com.wifianalyzer.wifianalyzerproject.ui.activityDeprecated.aroundWifiResultsList
 
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
-import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.wifianalyzer.wifianalyzerproject.R
 import com.wifianalyzer.wifianalyzerproject.databinding.ActivityFilterSavedDevicesBinding
 import com.wifianalyzer.wifianalyzerproject.ui.adapter.FilterSavedDevicesAdapter
-import com.wifianalyzer.wifianalyzerproject.viewmodel.AroundWifiResultsListViewModel
+import com.wifianalyzer.wifianalyzerproject.viewmodel.deprecated.AroundWifiResultsListViewModel
 
 class FilterSavedDevices : AppCompatActivity() {
     private lateinit var binding: ActivityFilterSavedDevicesBinding

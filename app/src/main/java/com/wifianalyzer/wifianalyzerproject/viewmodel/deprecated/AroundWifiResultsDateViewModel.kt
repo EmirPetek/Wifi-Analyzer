@@ -1,10 +1,11 @@
-package com.wifianalyzer.wifianalyzerproject.viewmodel
+package com.wifianalyzer.wifianalyzerproject.viewmodel.deprecated
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.wifianalyzer.wifianalyzerproject.repository.RssiSignalsRepo
 
 class AroundWifiResultsDateViewModel : ViewModel() {
+
     private val repo = RssiSignalsRepo()
 
     var rssiSignalUnixtsList : MutableLiveData<List<Long>> = repo.rssiSignalUnixtsList
@@ -12,4 +13,6 @@ class AroundWifiResultsDateViewModel : ViewModel() {
     fun getRssiUnixtsListData(userkey:String){
         repo.getRssiUnixtsListData(userkey)
     }
+
+
 }

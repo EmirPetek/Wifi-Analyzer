@@ -4,14 +4,10 @@ import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.content.SharedPreferences.Editor
-import android.content.pm.PackageManager
 import android.location.LocationManager
 import android.net.wifi.WifiManager
-import android.net.wifi.rtt.WifiRttManager
 import android.os.Build
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.widget.Button
 import androidx.appcompat.app.AlertDialog
 import android.widget.Toast
@@ -19,11 +15,8 @@ import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import com.wifianalyzer.wifianalyzerproject.databinding.ActivityMainBinding
-import com.wifianalyzer.wifianalyzerproject.repository.sensor.GetSensorData
 import com.wifianalyzer.wifianalyzerproject.repository.sensor.rtt.RTTHandler
-import com.wifianalyzer.wifianalyzerproject.ui.activity.AroundWifiInformation
-import com.wifianalyzer.wifianalyzerproject.ui.activity.AroundWifiResultsDate
-import com.wifianalyzer.wifianalyzerproject.ui.activity.CurrentWifiInformation
+import com.wifianalyzer.wifianalyzerproject.ui.activityDeprecated.AroundWifiInformation
 import java.security.SecureRandom
 
 class MainActivity : AppCompatActivity() {
@@ -52,12 +45,8 @@ class MainActivity : AppCompatActivity() {
 
    //     checkLocationPermission()
 
-        bindButtons()
+        //bindButtons()
 
-        binding.buttonGet.setOnClickListener {
-
-
-            }
 
 
 
@@ -66,14 +55,12 @@ class MainActivity : AppCompatActivity() {
 
     }
 
-    private fun bindButtons(){
+    /*private fun bindButtons(){
 
         binding.buttonGetCurrentWifiInfo.setOnClickListener { replaceActivity(CurrentWifiInformation())  }
         binding.buttonGetScanResultData.setOnClickListener { replaceActivity(AroundWifiInformation())    }
         binding.buttonGetData.setOnClickListener{ replaceActivity(AroundWifiResultsDate()) }
-
-
-    }
+    }*/
     private fun replaceActivity(activity: Activity){
         startActivity(Intent(this,activity::class.java))
     }

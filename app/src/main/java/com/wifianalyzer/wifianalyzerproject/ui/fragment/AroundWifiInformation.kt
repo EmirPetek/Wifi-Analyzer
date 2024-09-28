@@ -1,47 +1,49 @@
-package com.wifianalyzer.wifianalyzerproject.ui.activity
+package com.wifianalyzer.wifianalyzerproject.ui.fragment
 
 import android.Manifest
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import android.content.IntentFilter
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.location.LocationManager
 import android.net.wifi.ScanResult
 import android.net.wifi.WifiManager
 import android.os.Build
-import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.viewModels
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
+import androidx.fragment.app.Fragment
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import android.widget.Button
 import android.widget.Toast
-import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity.MODE_PRIVATE
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import androidx.lifecycle.Observer
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.google.firebase.database.FirebaseDatabase
 import com.wifianalyzer.wifianalyzerproject.R
 import com.wifianalyzer.wifianalyzerproject.data.RssiSignalData
 import com.wifianalyzer.wifianalyzerproject.data.sensor.SensorAccelerometer
 import com.wifianalyzer.wifianalyzerproject.data.sensor.SensorGyroscope
-import com.wifianalyzer.wifianalyzerproject.ui.adapter.AroundWifiInformationAdapter
-import com.wifianalyzer.wifianalyzerproject.databinding.ActivityAroundWifiInformationBinding
+import com.wifianalyzer.wifianalyzerproject.databinding.FragmentAroundWifiInformationBinding
 import com.wifianalyzer.wifianalyzerproject.repository.sensor.GetSensorData
+import com.wifianalyzer.wifianalyzerproject.ui.activityDeprecated.AroundWifiInformation.Companion.PERMISSIONS_REQUEST_CODE_ACCESS_FINE_LOCATION
+import com.wifianalyzer.wifianalyzerproject.ui.adapter.AroundWifiInformationAdapter
 import com.wifianalyzer.wifianalyzerproject.viewmodel.AroundWifiInformationViewModel
 import java.util.Timer
 import java.util.TimerTask
 
-class AroundWifiInformation : AppCompatActivity() {
+class AroundWifiInformation : Fragment() {
 
     private val viewModel: AroundWifiInformationViewModel by viewModels()
-    private lateinit var binding: ActivityAroundWifiInformationBinding
+    private lateinit var binding: FragmentAroundWifiInformationBinding
     private lateinit var wifiManager: WifiManager
     private lateinit var locationManager: LocationManager
     private lateinit var wifiScanReceiver: BroadcastReceiver
@@ -56,22 +58,16 @@ class AroundWifiInformation : AppCompatActivity() {
     private var isStartedScan = 0 // 0 hiç başlatılmamış / durdurulmuş halde, 1 başlatılmış
     var timer = Timer()
     var unixtimestamp : Long = System.currentTimeMillis()
-    private  var rssiSignalList: List<RssiSignalData> = mutableListOf()
-    private  var rssiSignalUnixTsList: List<Long> = mutableListOf()
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        binding = FragmentAroundWifiInformationBinding.inflate(inflater,container,false)
 
-    companion object {
-        const val PERMISSIONS_REQUEST_CODE_ACCESS_FINE_LOCATION = 1
-    }
+        wifiManager = requireContext().getSystemService(Context.WIFI_SERVICE) as WifiManager
+        locationManager = requireContext().getSystemService(Context.LOCATION_SERVICE) as LocationManager
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        binding = ActivityAroundWifiInformationBinding.inflate(layoutInflater)
-        setContentView(binding.root)
-
-        wifiManager = applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
-        locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
-
-        sharedPreferences = getSharedPreferences("userInfo", MODE_PRIVATE)
+        sharedPreferences = requireContext().getSharedPreferences("userInfo", MODE_PRIVATE)
         userKey = sharedPreferences.getString("userKey", "0")!!
 
         binding.progressBarAroundWifi.visibility = View.GONE
@@ -83,13 +79,14 @@ class AroundWifiInformation : AppCompatActivity() {
                 timer.cancel()
                 timer = Timer()
                 binding.buttonStartScan.setText(getString(R.string.start_scan))
-                Toast.makeText(applicationContext,getString(R.string.scan_finished),Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(),getString(R.string.scan_finished), Toast.LENGTH_SHORT).show()
                 period = 0
             }
         }
-        binding.imageViewBackButton.setOnClickListener { finish() }
+        binding.imageViewBackButton.setOnClickListener { findNavController().popBackStack() }
 
         wifiScanReceiver = object : BroadcastReceiver() {
+            @RequiresApi(Build.VERSION_CODES.R)
             override fun onReceive(context: Context?, intent: Intent?) {
                 val success = intent?.getBooleanExtra(WifiManager.EXTRA_RESULTS_UPDATED, false) ?: false
                 if (success) {
@@ -101,39 +98,18 @@ class AroundWifiInformation : AppCompatActivity() {
             }
         }
 
-        val intentFilter = IntentFilter()
+        /*val intentFilter = IntentFilter()
         intentFilter.addAction(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION)
-        registerReceiver(wifiScanReceiver, intentFilter)
+        registerReceiver(requireContext(),wifiScanReceiver, intentFilter,0)*/
         Log.e("kjdfsd",userKey)
 
 
-      /*  viewModel.getRssiUnixtsListData(userKey)
-        viewModel.rssiUnixtsList.observe(this, Observer {
-            rssiSignalUnixTsList = it
-            Log.e("rssiSignalUnixTsList  in scope -> ", rssiSignalUnixTsList.toString())
-
-        })
-
-        viewModel.getRssiListData(rssiSignalUnixTsList,userKey)
-        viewModel.rssiList.observe(this,Observer{
-            rssiSignalList = it
-            Log.e("rssiSignalList in scope -> ", rssiSignalList.toString())
-        })
-
-        Log.e("rssiSignalUnixTsList -> ", rssiSignalUnixTsList.toString())
-        Log.e("rssiSignalList -> ", rssiSignalList.toString())
-
-*/
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        unregisterReceiver(wifiScanReceiver)
+        return binding.root
     }
 
     private fun checkLocationPermission() {
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), PERMISSIONS_REQUEST_CODE_ACCESS_FINE_LOCATION)
+        if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(requireActivity(), arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), PERMISSIONS_REQUEST_CODE_ACCESS_FINE_LOCATION)
         } else {
             manageWifiScan()
 
@@ -152,6 +128,7 @@ class AroundWifiInformation : AppCompatActivity() {
         //unixtimestamp = System.currentTimeMillis()
 
         val task = object : TimerTask() {
+            @RequiresApi(Build.VERSION_CODES.R)
             override fun run() {
                 handler.post {
                     period--
@@ -159,7 +136,7 @@ class AroundWifiInformation : AppCompatActivity() {
                     if (period <= 0 ) {
                         unixtimestamp = System.currentTimeMillis()
                         timer.cancel()
-                        Toast.makeText(applicationContext,getString(R.string.scan_finished),Toast.LENGTH_SHORT).show()
+                        Toast.makeText(requireContext(),getString(R.string.scan_finished),Toast.LENGTH_SHORT).show()
                         binding.buttonStartScan.setText(getString(R.string.start_scan))
                     } else {
                         startWifiScan()
@@ -172,6 +149,7 @@ class AroundWifiInformation : AppCompatActivity() {
         timer.schedule(task, 0, (interval * 1000).toLong())
     }
 
+    @RequiresApi(Build.VERSION_CODES.R)
     private fun startWifiScan() {
         binding.progressBarAroundWifi.visibility = View.VISIBLE
         val success = wifiManager.startScan()
@@ -180,11 +158,13 @@ class AroundWifiInformation : AppCompatActivity() {
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.R)
     private fun scanSuccess() {
         val results = wifiManager.scanResults
         displayScanResults(results)
     }
 
+    @RequiresApi(Build.VERSION_CODES.R)
     private fun scanFailure() {
         val results = wifiManager.scanResults
         displayScanResults(results)
@@ -194,7 +174,7 @@ class AroundWifiInformation : AppCompatActivity() {
     private fun displayScanResults(results: List<ScanResult>) {
         var rssiObjList = RssiSignalData()
         //val ssid = results.get(results.indexOf("SSID"))
-        val getdata = GetSensorData(this)
+        val getdata = GetSensorData(requireContext())
         // Sensör verilerini almak için biraz beklemelisiniz, çünkü sensör verileri hemen alınmaz.
         // Aksi takdirde ilk değerler boş olabilir.
         Handler(Looper.getMainLooper()).postDelayed({
@@ -223,7 +203,7 @@ class AroundWifiInformation : AppCompatActivity() {
                         gyroscopeObj,
                         determineStandart(it.wifiStandard),
                         it.is80211mcResponder.toString()
-                        )
+                    )
                 viewModel.insertRssiSignal(rssiObjList,userKey, unixtimestamp)
             }
 
@@ -237,8 +217,8 @@ class AroundWifiInformation : AppCompatActivity() {
         Log.e("sayısal veriler: ", "period: $period || interval: $interval || duration: $duration")
 
         binding.recyclerViewAroundWifi.setHasFixedSize(true)
-        binding.recyclerViewAroundWifi.layoutManager = LinearLayoutManager(this)
-        adapter = AroundWifiInformationAdapter(this, results)
+        binding.recyclerViewAroundWifi.layoutManager = LinearLayoutManager(requireContext())
+        adapter = AroundWifiInformationAdapter(requireContext(), results)
         binding.recyclerViewAroundWifi.adapter = adapter
 
     }
@@ -256,7 +236,7 @@ class AroundWifiInformation : AppCompatActivity() {
 
     private fun showCustomAlertDialog() {
         val dialogView = layoutInflater.inflate(R.layout.alert_assign_around_wifi_scan_data, null)
-        val dialog = AlertDialog.Builder(this).setView(dialogView).create()
+        val dialog = AlertDialog.Builder(requireContext()).setView(dialogView).create()
 
         val etDuration = dialogView.findViewById<android.widget.EditText>(R.id.etDuration)
         val etInterval = dialogView.findViewById<android.widget.EditText>(R.id.etInterval)
@@ -266,7 +246,7 @@ class AroundWifiInformation : AppCompatActivity() {
 
         btnCancel.setOnClickListener {
             dialog.dismiss()
-            Toast.makeText(this, "Main Menuye Dönülüyor", Toast.LENGTH_SHORT).show()
+            Toast.makeText(requireContext(), "Main Menuye Dönülüyor", Toast.LENGTH_SHORT).show()
         }
 
         btnOk.setOnClickListener {
@@ -284,13 +264,5 @@ class AroundWifiInformation : AppCompatActivity() {
         }
 
         dialog.show()
-    }
-
-    private fun insertData(obj: RssiSignalData, currentTimestamp: Long) {
-        Log.e("klfgjl", "klsfld")
-        val db = FirebaseDatabase.getInstance().getReference("rssiSignals").child(currentTimestamp.toString())
-        db.push().setValue(obj).addOnFailureListener { it ->
-            Log.e("hata: ", it.toString())
-        }
     }
 }

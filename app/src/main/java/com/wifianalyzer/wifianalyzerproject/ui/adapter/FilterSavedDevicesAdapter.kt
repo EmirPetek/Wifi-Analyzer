@@ -1,7 +1,6 @@
 package com.wifianalyzer.wifianalyzerproject.ui.adapter
 
 import android.content.Context
-import android.media.RouteListingPreference
 import android.util.SparseBooleanArray
 import android.view.LayoutInflater
 import android.view.View
@@ -11,8 +10,7 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.RecyclerView
 import com.wifianalyzer.wifianalyzerproject.R
 import com.wifianalyzer.wifianalyzerproject.data.DevicesData
-import com.wifianalyzer.wifianalyzerproject.data.RssiSignalData
-import com.wifianalyzer.wifianalyzerproject.viewmodel.AroundWifiResultsListViewModel
+import com.wifianalyzer.wifianalyzerproject.viewmodel.deprecated.AroundWifiResultsListViewModel
 
 class FilterSavedDevicesAdapter(
     var mContext: Context,

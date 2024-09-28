@@ -2,11 +2,66 @@
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/nav_graph">
-
-    <activity
-        android:id="@+id/mainActivity"
-        android:name="com.wifianalyzer.wifianalyzerproject.MainActivity"
-        android:label="activity_main"
-        tools:layout="@layout/activity_main" />
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/homeFragment">
+    <fragment
+        android:id="@+id/homeFragment"
+        android:name="com.wifianalyzer.wifianalyzerproject.ui.fragment.HomeFragment"
+        android:label="fragment_home"
+        tools:layout="@layout/fragment_home" >
+        <action
+            android:id="@+id/action_homeFragment_to_currentWifiInformationFragment"
+            app:destination="@id/currentWifiInformationFragment" />
+        <action
+            android:id="@+id/action_homeFragment_to_aroundWifiInformation"
+            app:destination="@id/aroundWifiInformation" />
+        <action
+            android:id="@+id/action_homeFragment_to_aroundWifiResultsDate"
+            app:destination="@id/aroundWifiResultsDate" />
+        <action
+            android:id="@+id/action_homeFragment_to_currentLocationFragment"
+            app:destination="@id/currentLocationFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/currentWifiInformationFragment"
+        android:name="com.wifianalyzer.wifianalyzerproject.ui.fragment.CurrentWifiInformationFragment"
+        android:label="fragment_current_wifi_information"
+        tools:layout="@layout/fragment_current_wifi_information" />
+    <fragment
+        android:id="@+id/aroundWifiInformation"
+        android:name="com.wifianalyzer.wifianalyzerproject.ui.fragment.AroundWifiInformation"
+        android:label="fragment_around_wifi_information"
+        tools:layout="@layout/fragment_around_wifi_information" />
+    <fragment
+        android:id="@+id/aroundWifiResultsDate"
+        android:name="com.wifianalyzer.wifianalyzerproject.ui.fragment.AroundWifiResultsDate"
+        android:label="fragment_around_wifi_results_date"
+        tools:layout="@layout/fragment_around_wifi_results_date" >
+        <action
+            android:id="@+id/action_aroundWifiResultsDate_to_aroundWifiResultsList"
+            app:destination="@id/aroundWifiResultsList" />
+    </fragment>
+    <fragment
+        android:id="@+id/aroundWifiResultsList"
+        android:name="com.wifianalyzer.wifianalyzerproject.ui.fragment.aroundWifiResultsList.AroundWifiResultsList"
+        android:label="fragment_around_wifi_results_list"
+        tools:layout="@layout/fragment_around_wifi_results_list" >
+        <action
+            android:id="@+id/action_aroundWifiResultsList_to_filterSavedDevices"
+            app:destination="@id/filterSavedDevices" />
+    </fragment>
+    <fragment
+        android:id="@+id/filterSavedDevices"
+        android:name="com.wifianalyzer.wifianalyzerproject.ui.fragment.aroundWifiResultsList.FilterSavedDevices"
+        android:label="fragment_filter_saved_devices"
+        tools:layout="@layout/fragment_filter_saved_devices" >
+        <action
+            android:id="@+id/action_filterSavedDevices_to_aroundWifiResultsList"
+            app:destination="@id/aroundWifiResultsList" />
+    </fragment>
+    <fragment
+        android:id="@+id/currentLocationFragment"
+        android:name="com.wifianalyzer.wifianalyzerproject.ui.fragment.locationInfo.CurrentLocationFragment"
+        android:label="fragment_current_location"
+        tools:layout="@layout/fragment_current_location" />
 </navigation>
