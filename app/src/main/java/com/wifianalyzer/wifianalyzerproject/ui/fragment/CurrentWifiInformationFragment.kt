@@ -19,6 +19,7 @@ import androidx.core.content.ContextCompat
 import androidx.navigation.fragment.findNavController
 import com.wifianalyzer.wifianalyzerproject.databinding.FragmentCurrentWifiInformationBinding
 import com.wifianalyzer.wifianalyzerproject.ui.activityDeprecated.CurrentWifiInformation
+import com.wifianalyzer.wifianalyzerproject.util.CalculateHyperbolicAlgorithm
 
 class CurrentWifiInformationFragment : Fragment() {
 
@@ -45,6 +46,22 @@ class CurrentWifiInformationFragment : Fragment() {
 
         checkLocationPermission()
         binding.imageViewArrowBack.setOnClickListener { findNavController().popBackStack() }
+
+
+
+
+        binding.buttonCalcHyperbolic.setOnClickListener {
+            val etX = binding.editTextAPX.text.toString().toDouble()
+            val etY = binding.editTextAPY.text.toString().toDouble()
+            val etNumOfAP = binding.editTextAPNumber.text.toString().toInt()
+            val etDestim = binding.editTextDestim.text.toString().toDouble()
+
+            val res = CalculateHyperbolicAlgorithm().hyperbolicAlgorithmSingle(etX,etY,etNumOfAP,etDestim)
+            binding.textViewHyperbolicLocation.text = res.toString()
+
+        }
+
+
 
         // Inflate the layout for this fragment
         return binding.root

@@ -37,6 +37,10 @@ import com.wifianalyzer.wifianalyzerproject.repository.sensor.GetSensorData
 import com.wifianalyzer.wifianalyzerproject.ui.activityDeprecated.AroundWifiInformation.Companion.PERMISSIONS_REQUEST_CODE_ACCESS_FINE_LOCATION
 import com.wifianalyzer.wifianalyzerproject.ui.adapter.AroundWifiInformationAdapter
 import com.wifianalyzer.wifianalyzerproject.viewmodel.AroundWifiInformationViewModel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
 import java.util.Timer
 import java.util.TimerTask
 
@@ -52,6 +56,7 @@ class AroundWifiInformation : Fragment() {
     private lateinit var userKey: String
 
     private var period = 0
+    private var totalPeriod = 0
     private var duration = 0
     private var interval = 0
     private var location = ""
@@ -94,14 +99,14 @@ class AroundWifiInformation : Fragment() {
                 } else {
                     scanFailure()
                 }
-                binding.progressBarAroundWifi.visibility = View.GONE
+                //binding.progressBarAroundWifi.visibility = View.GONE
             }
         }
 
         /*val intentFilter = IntentFilter()
         intentFilter.addAction(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION)
         registerReceiver(requireContext(),wifiScanReceiver, intentFilter,0)*/
-        Log.e("kjdfsd",userKey)
+        //Log.e("kjdfsd",userKey)
 
 
         return binding.root
@@ -132,13 +137,17 @@ class AroundWifiInformation : Fragment() {
             override fun run() {
                 handler.post {
                     period--
+                    bindPeriodTextView(period,totalPeriod)
                     unixtimestamp = System.currentTimeMillis()
+                    //Log.e("line 140 period: ", period.toString())
                     if (period <= 0 ) {
                         unixtimestamp = System.currentTimeMillis()
                         timer.cancel()
                         Toast.makeText(requireContext(),getString(R.string.scan_finished),Toast.LENGTH_SHORT).show()
                         binding.buttonStartScan.setText(getString(R.string.start_scan))
+                        //binding.progressBarAroundWifi.visibility = View.GONE
                     } else {
+                        //binding.progressBarAroundWifi.visibility = View.VISIBLE
                         startWifiScan()
 
                     }
@@ -155,18 +164,20 @@ class AroundWifiInformation : Fragment() {
         val success = wifiManager.startScan()
         if (!success) {
             scanFailure()
-        }
+        }else scanSuccess()
     }
 
     @RequiresApi(Build.VERSION_CODES.R)
     private fun scanSuccess() {
         val results = wifiManager.scanResults
+        Log.e("scanState: ", "scanSuccess")
         displayScanResults(results)
     }
 
     @RequiresApi(Build.VERSION_CODES.R)
     private fun scanFailure() {
         val results = wifiManager.scanResults
+        Log.e("scanState: ", "scanFailure")
         displayScanResults(results)
     }
 
@@ -178,21 +189,29 @@ class AroundWifiInformation : Fragment() {
         // Sensör verilerini almak için biraz beklemelisiniz, çünkü sensör verileri hemen alınmaz.
         // Aksi takdirde ilk değerler boş olabilir.
         Handler(Looper.getMainLooper()).postDelayed({
-            val accelerometerData = getdata.getAccelerometerData()
-            val gyroscopeData = getdata.getGyroscopeData()
 
-            val accelerometerObj = SensorAccelerometer(accelerometerData[0],accelerometerData[1],accelerometerData[2])
-            val gyroscopeObj = SensorGyroscope(gyroscopeData[0],gyroscopeData[1],gyroscopeData[2])
-            // Verileri istediğiniz gibi işleyebilirsiniz
-            Log.e("AnotherClass", "Accelerometer - x: ${accelerometerData[0]}, y: ${accelerometerData[1]}, z: ${accelerometerData[2]}")
-            Log.e("AnotherClass", "Gyroscope - x: ${gyroscopeData[0]}, y: ${gyroscopeData[1]}, z: ${gyroscopeData[2]}")
+            CoroutineScope(Dispatchers.IO).launch {
+                val accelerometerDeferred = async {
+                    val accelerometerData = getdata.getAccelerometerData()
+                    SensorAccelerometer(accelerometerData[0], accelerometerData[1], accelerometerData[2])
+                }
 
+                val gyroscopeDeferred = async {
+                    val gyroscopeData = getdata.getGyroscopeData()
+                    SensorGyroscope(gyroscopeData[0], gyroscopeData[1], gyroscopeData[2])
+                }
 
-            for (it in results){
-                Log.e("scan result: ", it.toString())
-                Log.e("standart: ", determineStandart(it.wifiStandard))
-                rssiObjList =
-                    RssiSignalData(
+                // Tüm veriler geldikten sonra await ile sonuçları alıyoruz
+                val accelerometerObj = accelerometerDeferred.await()
+                val gyroscopeObj = gyroscopeDeferred.await()
+
+                // Verilerin log'lanması
+                //Log.e("AnotherClass", "Accelerometer - x: ${accelerometerObj.x}, y: ${accelerometerObj.y}, z: ${accelerometerObj.z}")
+                //Log.e("AnotherClass", "Gyroscope - x: ${gyroscopeObj.x}, y: ${gyroscopeObj.y}, z: ${gyroscopeObj.z}")
+
+                // Gelen sonuçları veritabanına kaydetme işlemi
+                for (it in results) {
+                    rssiObjList = RssiSignalData(
                         it.SSID,
                         it.BSSID,
                         it.level,
@@ -204,17 +223,28 @@ class AroundWifiInformation : Fragment() {
                         determineStandart(it.wifiStandard),
                         it.is80211mcResponder.toString()
                     )
-                viewModel.insertRssiSignal(rssiObjList,userKey, unixtimestamp)
+                    //Log.e("veritabanı: ",  "dbye kaydedildi")
+
+                    // Veritabanına ekleme işlemi yapılabilir
+                    viewModel.insertRssiSignal(rssiObjList, userKey, unixtimestamp)
+                }
             }
+
+            binding.progressBarAroundWifi.visibility = View.GONE
+
+
+
+
+
 
             // Sensör dinlemeyi durdurun
             getdata.stopListening()
         }, 1000) // 1 saniye bekleyin (sensör verilerinin toplanması için)
 
 
-        Log.e("rssi verileri: ", rssiObjList.toString())
+        //Log.e("rssi verileri: ", rssiObjList.toString())
 
-        Log.e("sayısal veriler: ", "period: $period || interval: $interval || duration: $duration")
+        //Log.e("sayısal veriler: ", "period: $period || interval: $interval || duration: $duration")
 
         binding.recyclerViewAroundWifi.setHasFixedSize(true)
         binding.recyclerViewAroundWifi.layoutManager = LinearLayoutManager(requireContext())
@@ -255,6 +285,8 @@ class AroundWifiInformation : Fragment() {
             location = etLocation.text.toString()
 
             period = ((duration * 60) / interval)
+            totalPeriod = period
+            bindPeriodTextView(0,totalPeriod)
             period++
             checkLocationPermission()
             dialog.dismiss()
@@ -264,5 +296,9 @@ class AroundWifiInformation : Fragment() {
         }
 
         dialog.show()
+    }
+
+    fun bindPeriodTextView(currentPeriod: Int, totalPeriod:Int){
+        binding.textViewCurrentPeriodNumeric.text = "$currentPeriod/$totalPeriod"
     }
 }
