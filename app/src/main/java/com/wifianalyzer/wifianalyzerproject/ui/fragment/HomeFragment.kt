@@ -32,6 +32,7 @@ class HomeFragment : Fragment() {
         binding.buttonGetScanResultData.setOnClickListener { findNavController().navigate(R.id.action_homeFragment_to_aroundWifiInformation)    }
         binding.buttonGetData.setOnClickListener{ findNavController().navigate(R.id.action_homeFragment_to_aroundWifiResultsDate) }
         binding.buttonGetLocationInfo.setOnClickListener { findNavController().navigate(R.id.action_homeFragment_to_currentLocationFragment) }
+        binding.buttonFormulaScreen.setOnClickListener { findNavController().navigate(R.id.action_homeFragment_to_formulaTestFragment) }
         // Inflate the layout for this fragment
         return binding.root
     }

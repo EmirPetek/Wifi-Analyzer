@@ -21,6 +21,9 @@
         <action
             android:id="@+id/action_homeFragment_to_currentLocationFragment"
             app:destination="@id/currentLocationFragment" />
+        <action
+            android:id="@+id/action_homeFragment_to_formulaTestFragment"
+            app:destination="@id/formulaTestFragment" />
     </fragment>
     <fragment
         android:id="@+id/currentWifiInformationFragment"
@@ -64,4 +67,9 @@
         android:name="com.wifianalyzer.wifianalyzerproject.ui.fragment.locationInfo.CurrentLocationFragment"
         android:label="fragment_current_location"
         tools:layout="@layout/fragment_current_location" />
+    <fragment
+        android:id="@+id/formulaTestFragment"
+        android:name="com.wifianalyzer.wifianalyzerproject.ui.fragment.formulaTest.FormulaTestFragment"
+        android:label="fragment_formula_test"
+        tools:layout="@layout/fragment_formula_test" />
 </navigation>
