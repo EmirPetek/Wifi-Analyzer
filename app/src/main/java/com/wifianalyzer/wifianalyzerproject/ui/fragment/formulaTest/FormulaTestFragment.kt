@@ -6,10 +6,8 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.wifianalyzer.wifianalyzerproject.R
 import com.wifianalyzer.wifianalyzerproject.databinding.FragmentFormulaTestBinding
 import com.wifianalyzer.wifianalyzerproject.formulaTest.FormulTestleri
-import com.wifianalyzer.wifianalyzerproject.formulaTest.Test
 
 class FormulaTestFragment : Fragment() {
 
@@ -24,7 +22,7 @@ class FormulaTestFragment : Fragment() {
 
         binding.buttonTest.setOnClickListener {
             Log.e("Action","Buton tıklandı")
-            FormulTestleri(requireContext().applicationContext).main()
+            FormulTestleri(requireContext().applicationContext,binding.lineChart).main()
         }
 
         return binding.root
