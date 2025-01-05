@@ -1,47 +1,51 @@
 package com.wifianalyzer.wifianalyzerproject.formulaTest
 
 import android.content.Context
-import android.graphics.Color
 import android.util.Log
-import org.apache.commons.math3.linear.Array2DRowRealMatrix
-import org.apache.commons.math3.linear.ArrayRealVector
-import org.apache.commons.math3.linear.LUDecomposition
-import org.apache.commons.math3.linear.MatrixUtils
-import org.apache.commons.math3.linear.RealMatrix
-import org.apache.commons.math3.linear.RealVector
-import java.lang.Math.log10
-import java.lang.Math.sqrt
-import kotlin.math.max
-import kotlin.math.min
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.wifianalyzer.wifianalyzerproject.ui.fragment.formulaTest.adapter.FormulaTestFragmentAdapter
+import org.apache.commons.math3.linear.*
+import kotlin.math.log10
 import kotlin.math.pow
-import com.github.mikephil.charting.charts.LineChart
-import com.github.mikephil.charting.data.Entry
-import com.github.mikephil.charting.data.LineData
-import com.github.mikephil.charting.data.LineDataSet
-import com.github.mikephil.charting.utils.ColorTemplate
+import kotlin.math.sqrt
 
-
-class FormulTestleri(val mContext: Context, val lineChart: LineChart) {
+/**
+ * FormulTestleri:
+ *  - RSSI verilerini okuyup 3D diziye yerleştirir,
+ *  - Sadece MS3 (msIndex=2) için Hyperbolic, LS, Proposed (ERLAK) algoritmalarını uygular,
+ *  - Elde edilen 1000 hata değerinden CDF çizimi yapar.
+ */
+class FormulTestleri(
+    private val mContext: Context,
+    val recyclerViewGraph: RecyclerView
+) {
 
     companion object {
-        val Xo = doubleArrayOf(5.80, 8.50, 14.10, 18.15, 27.55, 32.20, 41.15, 50.05, 45.95, 61.80)
-        val Yo = doubleArrayOf(0.35, 12.00, 2.55, 11.70, 3.30, 10.40, 0.35, 0.35, 12.00, 0.75)
-        val P0 = -35.92
-        val nreal = 2
+        // AP Koordinatları
+        val Xo = doubleArrayOf(5.80,  8.50, 14.10, 18.15, 27.55, 32.20, 41.15, 50.05, 45.95, 61.80)
+        val Yo = doubleArrayOf(0.35, 12.00,  2.55, 11.70,  3.30, 10.40,  0.35,  0.35, 12.00,  0.75)
 
+        // Path-loss parametreleri
+        const val P0 = -35.92
+        const val nreal = 2.0
+
+        // Ölçüm noktaları (7 adet)
         val pointx = doubleArrayOf(50.10, 5.80, 28.80, 42.60, 12.00, 26.10, 32.70)
-        val pointy = doubleArrayOf(5.50, 10.80, 6.20, 5.95, 10.10, 8.65, 1.45)
+        val pointy = doubleArrayOf( 5.50,10.80,  6.20,  5.95, 10.10,  8.65,  1.45)
+
+        val centerCdfArraylist = ArrayList<CenterCDFDataClass>()
+        private lateinit var adapter: FormulaTestFragmentAdapter
 
     }
 
     fun main() {
-        // Area dimensions
-
         val AP_number = 10
         val measured_points = 7
         val measured_counts = 1000
 
-        val accessPointNames = arrayListOf(
+        // TXT dosya isimleri
+        val accessPointNames = listOf(
             "TPLINK03-64-70-02-F8-6F-9C",
             "TPLINK04-64-70-02-F8-70-D0",
             "TPLINK06-64-70-02-F8-70-72",
@@ -54,19 +58,16 @@ class FormulTestleri(val mContext: Context, val lineChart: LineChart) {
             "TPLINKN-64-70-02-F8-AB-BA"
         )
 
-        // Dosyalardan verileri oku ve Prs dizisine aktar
+        // 1) Dosyaları okuyup 2D dizi (Prs[i][j]) -> 7x10 boyut
         val Prs = Array(measured_points) { arrayOfNulls<List<Int>>(AP_number) }
-        for (i in 0 until measured_points) { // 0'dan başlatıyoruz| toplam: 7
-            for (j in 0 until AP_number) { // 0'dan başlatıyoruz|  toplam: 10
-                val filePath =
-                    "1/Results/N${i + 1}/${accessPointNames[j]}.txt" // 1-based index correction
+        for (i in 0 until measured_points) {
+            for (j in 0 until AP_number) {
+                val filePath = "1/Results/N${i + 1}/${accessPointNames[j]}.txt"
                 try {
-                    // Assets içinden dosyayı aç
                     mContext.assets.open(filePath).use { inputStream ->
-                        val valuesRead =
-                            inputStream.bufferedReader().readLines().mapNotNull { it.toIntOrNull() }
+                        val valuesRead = inputStream.bufferedReader().readLines()
+                            .mapNotNull { it.toIntOrNull() }
                         Prs[i][j] = valuesRead
-                        //Log.e("State", "Dosya okundu: i=$i, j=$j, $filePath")
                     }
                 } catch (e: Exception) {
                     Log.e("State", "Dosya okunamadı: i=$i, j=$j, $filePath", e)
@@ -74,424 +75,314 @@ class FormulTestleri(val mContext: Context, val lineChart: LineChart) {
             }
         }
 
-        processData(measured_points, AP_number, measured_counts, Prs)
+        // 2) 3D dizi (7x10x1000)
+        val mValues = convertTo3D(measured_points, AP_number, measured_counts, Prs)
 
-        // Alınan verilerin loglanması
-        for (i in Prs.indices) {
-            for (j in Prs[i].indices) {
-                //Log.e("PRS: ", "Prs[$i][$j]: ${Prs[i][j]}")
-            }
+
+        // N tane ölçüm noktalarını yazdır.
+        for (ms in 0..<measured_points) {
+            loopBeginsForSingleMS(ms,measured_counts,AP_number,mValues)
         }
+
+
+
+        //loopBeginsForSingleMS(5,measured_counts,AP_number,mValues)
+
+        // 3) Yalnızca MS3 (fiteration=2) için hesaplama ve CDF plot
+       /* loopBeginsForSingleMS(
+            msIndex = 6,  // MS3
+            measuredCounts = measured_counts,
+            apNumber = AP_number,
+            mValues = mValues
+        )*/
     }
 
-    fun processData(
+    /**
+     * Prs -> 3D dizi: [measuredPoints][apNumber][1000]
+     */
+    private fun convertTo3D(
         measuredPoints: Int,
         apNumber: Int,
         measuredCounts: Int,
-        prs: Array<Array<List<Int>?>> // 2D array of nullable lists
-    ) {
-
-
-        // 1. Boş değerleri 0 ile doldurma
-//        val prsArray = prs.map { row ->
-//            row.map { col ->
-//                col ?: listOf(0) // Eğer null ise [0] atanır
-//            }
-//        }
-        //val prsArray = cellToMat(prs)
-        val rows = measuredPoints*measuredCounts
-        val cols = apNumber
-        //val prsArray: Array<Array<List<Int>>> = Array(rows) { Array(cols) { emptyList() } }
-        val prsArray = Array(rows) { IntArray(cols) }
-
-
-        var counter = 0
-        var sp1 = 0
-        var ep1 = measuredPoints
-        var elementIndex = 0
-        for (i in prs.indices){
-            for (j in prs[i].indices){
-                val list = prs[i][j]
-                if (list != null) {
-                    for (rssi in list){
-                        elementIndex = counter % (measuredPoints*measuredCounts)
-                        counter++
-                        //Log.e("Element:", "$rssi  elementIndex: $elementIndex : i:$i j:$j")
-                        prsArray[elementIndex][j] = rssi
-                    }
-                }
-            }
-        }
-
-        //prsArrayde gezinmek
-        for (i in prsArray.indices) {
-            for (j in prsArray[i].indices) {
-                //Log.e("prsArray: ","prsArray[$i][$j] = ${prsArray[i][j]}")
-            }
-        }
-
-//        for (i in prsArray.indices){
-//            //Log.e("i: ", i.toString())
-//            for (j in prsArray[i].indices){
-//                //Log.e("j: ", j.toString())
-//                for (k in prs[j]) {
-//                    Log.e("sayılar: ", "i:$i j:$j k:$k")
-//                }
-//            }
-//        }
-
-        /*for (i in prsArray.indices) {
-            for (j in prsArray[i].indices) {
-                //Log.e("PRS: ", "Prs[$i][$j]: ${prsArray[i][j]}")
-            }
-        }*/
-
-
-
-        // 2. 3D Dizi (Mvalues) oluşturma
+        prs: Array<Array<List<Int>?>>
+    ): Array<Array<IntArray>> {
         val mValues = Array(measuredPoints) {
             Array(apNumber) {
-                IntArray(measuredCounts) { 0 } // Her AP için 1000 değer
+                IntArray(measuredCounts)
             }
         }
-
-        // 3. Mvalues dizisini doldurma
-        var sp = 0 // Başlangıç (0-based index)
-        var ep = measuredCounts // Bitiş (ilk dilim)
-
-// Verilerin kopyalanması işlemi
-        for (j in 0 until measuredPoints) {
-            var k = 0
-
-            for (i in sp until ep) {
-                for (l in 0 until apNumber) {
-                        mValues[j][l][k] = prsArray[i][l]
+        for (i in 0 until measuredPoints) {
+            for (j in 0 until apNumber) {
+                val rssiList = prs[i][j] ?: emptyList()
+                val limit = minOf(rssiList.size, measuredCounts)
+                for (k in 0 until limit) {
+                    mValues[i][j][k] = rssiList[k]
                 }
-                k++
             }
-
-            sp += measuredCounts // Yeni dilim başlangıcı
-            ep += measuredCounts // Yeni dilim bitişi
         }
-
-        //mValuesi ile ilgili şeyleri ekrana yazdır.
-       /* Log.e("mp",measuredPoints.toString())
-        Log.e("mc",measuredCounts.toString())
-        Log.e("ap no",apNumber.toString())
-        Log.e("","Measured Points (Outer Array) size: ${mValues.size}")
-        for (pointIndex in mValues.indices) {
-            Log.e("mValues", "Point $pointIndex:")
-            for (apIndex in mValues[pointIndex].indices) {
-                Log.e("mValues","  AP $apIndex: ${mValues[pointIndex][apIndex].joinToString(", ", prefix = "[", postfix = "]")}")
-            }
-        }*/
-
-
-        loopBeginsHere(measuredPoints, measuredCounts, apNumber, mValues)
-
-
+        return mValues
     }
 
-    fun cellToMat(Prs: Array<Array<List<Int>?>>): Array<IntArray> {
-        val numRows = Prs[0][0]?.size ?: 0 // Her hücredeki liste boyutunu alıyoruz (örneğin 1000)
-        val numCols = Prs.size * Prs[0].size // Toplam sütun sayısı (measuredPoints * APNumber)
-
-        val result = Array(numRows) { IntArray(numCols) }
-
-        var colIndex = 0
-        for (i in Prs.indices) {
-            for (j in Prs[i].indices) {
-                // Hücreyi alıp 1000 elemanlı listeyi matrise ekliyoruz
-                Prs[i][j]?.let { values ->
-                    for (k in values.indices) {
-                        result[k][colIndex] = values[k]
-                    }
-                }
-                colIndex++
-            }
-        }
-
-        return result
-    }
-    fun processPrs(measuredPoints: Int, apNumber: Int, prs: Array<Array<List<Int>?>>): Array<Array<IntArray>> {
-        // 1. Boş değerleri 0 ile doldur
-        val prsArray = Array(measuredPoints) {
-            Array(apNumber) {
-                prs[it][it] ?: listOf(0)  // Eğer null ise [0] atanır
-            }
-        }
-
-        // 2. 3D Dizi (mValues) oluşturma
-        val mValues = Array(measuredPoints) {
-            Array(apNumber) {
-                IntArray(1000) { 0 } // Her AP için 1000 değer
-            }
-        }
-
-        // 3. Mvalues dizisini doldurma
-        var sp = 0
-        var ep = 1000
-        for (j in 0 until measuredPoints) {
-            var i = sp
-            while (i < minOf(ep, prsArray.size)) { // i'nin sınır kontrolü
-                for (l in 0 until apNumber) {
-                    // her bir AP için veriyi kopyala
-                    val values = prsArray[i][l] ?: listOf(0) // boş ise [0] kullan
-                    for (k in values.indices) {
-                        mValues[j][l][k] = values[k] // Mvalues dizisine veriyi atıyoruz
-                    }
-                }
-                i++
-            }
-            sp += 1000
-            ep += 1000
-        }
-
-        return mValues // Döndürdüğümüz değer doğru türde olacak: Array<Array<IntArray>>
-    }
-
-
-
-    fun loopBeginsHere(
-        measured_points: Int,
-        measured_counts: Int,
-        AP_number: Int,
-        Mvalues: Array<Array<IntArray>>
+    /**
+     * Sadece tek bir ölçüm noktası (msIndex) için,
+     * 1000 ölçümde 3 algoritmayı (Hyperbolic, LS, Proposed) çalıştırır.
+     * Elde edilen hatalarla CDF grafiği oluşturur.
+     */
+    private fun loopBeginsForSingleMS(
+        msIndex: Int,
+        measuredCounts: Int,
+        apNumber: Int,
+        mValues: Array<Array<IntArray>>
     ) {
-        var counter = 0
-        var Kpoints = DoubleArray(measured_points)
-        val Evalueshyp = Array(measured_points) { DoubleArray(measured_counts) }
-        val Evalueszero = Array(measured_points) { DoubleArray(measured_counts) }
-        val Evalueslst = Array(measured_points) { DoubleArray(measured_counts) }
-        //val destim = DoubleArray(AP_number)
+        // 3 dizi, her biri 1000 uzunluk: Hyperbolic, LS, Proposed hataları
+        val Dhyp = DoubleArray(measuredCounts)
+        val Dzero = DoubleArray(measuredCounts)
+        val Dlst = DoubleArray(measuredCounts)
 
-        for (fiteration in 0 until measured_points) {
-            var Dhyp = DoubleArray(measured_counts)
-            var Dzero = DoubleArray(measured_counts)
-            var Dlst = DoubleArray(measured_counts)
-            var Ktotal = DoubleArray(measured_counts)
-
-            for (miteration in 0 until measured_counts) {
-                var X = Xo
-                var Y = Yo
-                var N = X.size
-                //Log.e("Sayılar: ", "X: ${X.size} Y:${Y.size} N:$N")
-
-                val destim = DoubleArray(N)
-                val Pr = DoubleArray(N)
-                for (apiteration in 0 until N) {
-                    Pr[apiteration] = Mvalues[fiteration][apiteration][miteration].toDouble()
-                }
-
-                for (i in 0 until N) {
-                    destim[i] = 10.0.pow((P0 - Pr[i]) / (10 * nreal))
-                }
-
-                val xestimhyp = Array(2){DoubleArray(1)}
-
-                val derrorhyp = sqrt((pointx[fiteration] - xestimhyp[0][0]).pow(2) + (pointy[fiteration] - xestimhyp[1][0]).pow(2))
-                Dhyp[miteration] = derrorhyp
-
-                // Least square algorithm
-                val H = Array(AP_number - 1) { DoubleArray(3) }
-                val b = Array(AP_number - 1) { DoubleArray(1) }
-
-                for (i in 0 until AP_number - 1) {
-                    H[i][0] = 2 * Xo[i + 1]
-                    H[i][1] = 2 * Yo[i + 1]
-                    b[i][0] = Xo[i + 1].pow(2) + Yo[i + 1].pow(2) - destim[i + 1].pow(2) + destim[0].pow(2)
-                }
-
-                var xzero = calculateXzeroXestim(X,Y,N,destim)
-                // xzero dizisini kontrol et ve sınırla
-                if (xzero[0] < 0) {
-                    xzero[0] = 0.1
-                }
-                if (xzero[0] > 100) {
-                    xzero[0] = 99.9
-                }
-                if (xzero[1] < 0) {
-                    xzero[1] = 0.1
-                }
-                if (xzero[1] > 100) {
-                    xzero[1] = 99.9
-                }
-
-                val dzero = sqrt((pointx[fiteration] - xzero[0]).pow(2) + (pointy[fiteration] - xzero[1]).pow(2))
-
-                // New formula instead of least square
-                for (i in 0 until N - 1) {
-                    H[i][0] = 2 * (10.0.pow((Pr[i + 1] - Pr[i]) / (5 * nreal)) * Xo[i + 1]) - 2 * Xo[i]
-                    H[i][1] = 2 * (10.0.pow((Pr[i + 1] - Pr[i]) / (5 * nreal)) * Yo[i + 1]) - 2 * Yo[i]
-                    H[i][2] = 1 - 10.0.pow((Pr[i + 1] - Pr[i]) / (5 * nreal))
-                    b[i][0] = 10.0.pow((Pr[i + 1] - Pr[i]) / (5 * nreal)) * (Xo[i + 1].pow(2) + Yo[i + 1].pow(2)) - (Xo[i].pow(2) + Yo[i].pow(2))
-                }
-
-                val xestim = calculateXzeroXestim(X,Y,N,destim)
-                if (xestim[0] < 0) {
-                    xestim[0] = 0.1
-                }
-                if (xestim[0] > 100) {
-                    xestim[0] = 99.9
-                }
-                if (xestim[1] < 0) {
-                    xestim[1] = 0.1
-                }
-                if (xestim[1] > 100) {
-                    xestim[1] = 99.9
-                }
-
-                val dKestim = DoubleArray(AP_number)
-                val K = DoubleArray(AP_number)
-
-                for (i in 0 until AP_number) {
-                    dKestim[i] = sqrt((Xo[i] - xestim[0]).pow(2) + (Yo[i] - xestim[1]).pow(2))
-                    K[i] = Pr[i] + 10 * nreal * log10(dKestim[i])
-                }
-
-                val Kestim = K.average()
-                Ktotal[miteration] = Kestim
-
-                val destimlst = DoubleArray(AP_number)
-                for (i in 0 until AP_number) {
-                    destimlst[i] = 10.0.pow((Kestim - Pr[i]) / (10 * nreal))
-                }
-
-                // Least square tracking
-                val xestimlst = leastSquareTrackingWithC(Xo, Yo, AP_number, xestim, destimlst, 10)
-                val derrorlst = Math.sqrt((pointx[fiteration] - xestimlst[0]).pow(2) + (pointy[fiteration] - xestimlst[1]).pow(2))
-                Dlst[miteration] = derrorlst
-
-                Dhyp = Dhyp + derrorhyp
-                Dzero = Dzero + dzero
-                Dlst = Dlst + derrorlst
-
-//                // Store errors
-//                Evalueshyp[fiteration][miteration] = derrorhyp
-//                Evalueszero[fiteration][miteration] = dzero
-//                Evalueslst[fiteration][miteration] = derrorlst
-
-
-
-
+        // 1000 ölçüm üzerinden
+        for (miteration in 0 until measuredCounts) {
+            // 1) RSSI
+            val Pr = DoubleArray(apNumber)
+            for (apIteration in 0 until apNumber) {
+                Pr[apIteration] = mValues[msIndex][apIteration][miteration].toDouble()
             }
 
-            val Ktt = Ktotal.average().takeIf { it.isNaN().not() } ?: 0.0
-            Kpoints = Kpoints + Ktt
+            // 2) Mesafeye geçiş
+            val destim = DoubleArray(apNumber)
+            for (i in 0 until apNumber) {
+                destim[i] = 10.0.pow((P0 - Pr[i]) / (10.0 * nreal))
+            }
 
-            Evalueshyp[fiteration] = Dhyp.copyOf()
-            Evalueszero[fiteration] = Dzero.copyOf()
-            Evalueslst[fiteration] = Dlst.copyOf()
-            // Convert the arrays for plotting (histogram & CDF)
-            val histZero = getHistogram(Evalueszero[fiteration], measured_counts)
-            val histHyp = getHistogram(Evalueshyp[fiteration], measured_counts)
-            val histLst = getHistogram(Evalueslst[fiteration], measured_counts)
+            // -- HYPERBOLIC --
+            val xestimhyp = hyperbolicAlgorithm(Xo, Yo, apNumber, destim)
+            val derrorhyp = sqrt(
+                (pointx[msIndex] - xestimhyp[0]).pow(2) +
+                        (pointy[msIndex] - xestimhyp[1]).pow(2)
+            )
+            Dhyp[miteration] = derrorhyp
 
-            val cdfZero = getCdf(histZero.counts, measured_counts)
-            val cdfHyp = getCdf(histHyp.counts, measured_counts)
-            val cdfLst = getCdf(histLst.counts, measured_counts)
+            // -- LEAST SQUARE --
+            val xzero = calculateXzeroLS(Xo, Yo, apNumber, destim)
+            xzero[0] = xzero[0].coerceIn(0.1, 99.9)
+            xzero[1] = xzero[1].coerceIn(0.1, 99.9)
 
-            // Plot using MPAndroidChart
-            plotCdfChart(lineChart, histZero.centers, cdfZero, histHyp.centers, cdfHyp, histLst.centers, cdfLst)
+            val dzero = sqrt(
+                (pointx[msIndex] - xzero[0]).pow(2) +
+                        (pointy[msIndex] - xzero[1]).pow(2)
+            )
+            Dzero[miteration] = dzero
 
-            Log.e("Figure", fiteration.toString())
+            // -- PROPOSED (ERLAK) --
+            val xestimWls = calcNewFormulaXestim(Pr, Xo, Yo)
+            val xinitial = xestimWls.copyOf()
+
+            // K parametresi
+            val Karr = DoubleArray(apNumber)
+            for (i in 0 until apNumber) {
+                val dK = sqrt((Xo[i] - xinitial[0]).pow(2) + (Yo[i] - xinitial[1]).pow(2))
+                Karr[i] = Pr[i] + 10.0 * nreal * log10(dK)
+            }
+            val Kestim = Karr.average()
+
+            val destimlst = DoubleArray(apNumber)
+            for (i in 0 until apNumber) {
+                destimlst[i] = 10.0.pow((Kestim - Pr[i]) / (10.0 * nreal))
+            }
+
+            val xestimlst = leastSquareTrackingWithC(Xo, Yo, apNumber, xinitial, destimlst, 10)
+            xestimlst[0] = xestimlst[0].coerceIn(0.1, 99.9)
+            xestimlst[1] = xestimlst[1].coerceIn(0.1, 99.9)
+
+            val derrorlst = sqrt(
+                (pointx[msIndex] - xestimlst[0]).pow(2) +
+                        (pointy[msIndex] - xestimlst[1]).pow(2)
+            )
+            Dlst[miteration] = derrorlst
+        }
+
+        // Histogram & CDF
+        val histZero = getHistogram(Dzero, measuredCounts)
+        val cdfZero  = getCdf(histZero.counts, measuredCounts)
+        val histHyp  = getHistogram(Dhyp, measuredCounts)
+        val cdfHyp   = getCdf(histHyp.counts, measuredCounts)
+        val histLst  = getHistogram(Dlst, measuredCounts)
+        val cdfLst   = getCdf(histLst.counts, measuredCounts)
+
+
+
+        // Grafiğe çiz
+       /* plotCdfChart(
+            histZero.centers, cdfZero,
+            histHyp.centers,  cdfHyp,
+            histLst.centers,  cdfLst
+        )*/
+
+        val centerCDF = CenterCDFDataClass(
+            histZero.centers, cdfZero,
+            histHyp.centers,  cdfHyp,
+            histLst.centers,  cdfLst
+        )
+
+        // ekranda 7 tane farklı grafik çıkamsı beklenirken 7 tane aynı çıkıyor.
+
+        centerCdfArraylist.add(centerCDF)
+        Log.e("eklenen cdf: ", centerCDF.toString())
+        Log.e("karşılaştırma: ","centercdfsize: ${centerCdfArraylist.size} ve msindex: $msIndex")
+        //for (c in histHyp.centers) Log.e("centercdf: ", c.toString())
+        if (centerCdfArraylist.size == pointx.size){
+            Log.e("kjsdfşks","buraya girdi")
+            recyclerViewGraph.setHasFixedSize(true)
+            recyclerViewGraph.layoutManager = LinearLayoutManager(mContext)
+            adapter = FormulaTestFragmentAdapter(mContext, centerCdfArraylist)
+            recyclerViewGraph.adapter = adapter
 
         }
+
+
+        Log.e("SingleMS", "Plot completed for MS${msIndex+1}")
     }
 
-    fun hyperbolicAlgorithm(X: DoubleArray, Y: DoubleArray, N: Int, destim: DoubleArray): DoubleArray {
-        // Matrix H ve vektör b
-        val H = MatrixUtils.createRealMatrix(N - 1, 2)
+    /**
+     * MATLAB'teki hyperbolic_algorithm fonksiyonuna denk
+     */
+    fun hyperbolicAlgorithm(
+        X: DoubleArray,
+        Y: DoubleArray,
+        N: Int,
+        destim: DoubleArray
+    ): DoubleArray {
+        // H, b
+        val H = Array2DRowRealMatrix(N - 1, 2)
         val b = ArrayRealVector(N - 1)
-
-        for (i in 0 until N - 1) {
-            H.setEntry(i, 0, 2 * X[i + 1])
-            H.setEntry(i, 1, 2 * Y[i + 1])
-            b.setEntry(i, X[i + 1].pow(2) + Y[i + 1].pow(2)
-                    - destim[i + 1].pow(2) + destim[0].pow(2))
+        for (i in 0 until (N - 1)) {
+            H.setEntry(i, 0, 2.0 * X[i + 1])
+            H.setEntry(i, 1, 2.0 * Y[i + 1])
+            val bi = X[i + 1].pow(2) + Y[i + 1].pow(2)
+            - destim[i + 1].pow(2) + destim[0].pow(2)
+            b.setEntry(i, bi)
         }
 
-        val Vard = ArrayRealVector(N)
-        val S = MatrixUtils.createRealMatrix(N - 1, N - 1)
-
-        // Vard vektörünü doldurma
-        for (i in 0 until N) {
-            Vard.setEntry(i, destim[i].pow(4))
-        }
-
-        // S matrisini hesaplama
-        for (i in 0 until N - 1) {
-            for (j in 0 until N - 1) {
+        // S matrisi (MATLAB: Vard(i)=destim(i)^4)
+        val Vard = DoubleArray(N) { destim[it].pow(4) }
+        val S = Array2DRowRealMatrix(N - 1, N - 1)
+        for (i in 0 until (N - 1)) {
+            for (j in 0 until (N - 1)) {
                 if (i == j) {
-                    S.setEntry(i, j, Vard.getEntry(0) + Vard.getEntry(i + 1))
+                    S.setEntry(i, j, Vard[0] + Vard[i + 1])
                 } else {
-                    S.setEntry(i, j, Vard.getEntry(0))
+                    S.setEntry(i, j, Vard[0])
                 }
             }
         }
 
-        val HTranspose = H.transpose()
-        val SInverse = LUDecomposition(S).solver.inverse
-        val temp = HTranspose.multiply(SInverse).multiply(H)
-        val xestim = LUDecomposition(temp).solver.solve(HTranspose.multiply(SInverse).operate(b))
+        val Ht = H.transpose()
+        val Sinv = LUDecomposition(S).solver.inverse
+        val M1 = Ht.multiply(Sinv) // RealMatrix
+        val v1 = M1.operate(b)     // RealVector
+        val M2 = M1.multiply(H)    // RealMatrix
+        val M2inv = LUDecomposition(M2).solver.inverse
+        val xEstVec = M2inv.operate(v1)
 
-        // Adjust xestim values
-        val result = DoubleArray(2)
-        result[0] = xestim.getEntry(0).coerceIn(0.1, 99.9)
-        result[1] = xestim.getEntry(1).coerceIn(0.1, 99.9)
-
-        return result
+        val x = xEstVec.getEntry(0).coerceIn(0.1, 99.9)
+        val y = xEstVec.getEntry(1).coerceIn(0.1, 99.9)
+        return doubleArrayOf(x, y)
     }
 
-    fun calculateXzeroXestim(X: DoubleArray, Y: DoubleArray, N: Int, destim: DoubleArray): DoubleArray {
-        // H matrisini oluştur
-        val H = MatrixUtils.createRealMatrix(N - 1, 2)
+    /**
+     * MATLAB'teki least_square_algorithm fonksiyonuna denk
+     */
+    fun calculateXzeroLS(
+        X: DoubleArray,
+        Y: DoubleArray,
+        N: Int,
+        destim: DoubleArray
+    ): DoubleArray {
+        val H = Array2DRowRealMatrix(N - 1, 2)
+        val b = Array2DRowRealMatrix(N - 1, 1)
 
-        // b vektörünü oluştur
-        val b = ArrayRealVector(N - 1)
-
-        // H ve b matrislerini doldur
-        for (i in 0 until N - 1) {
-            H.setEntry(i, 0, 2 * X[i + 1])
-            H.setEntry(i, 1, 2 * Y[i + 1])
-            b.setEntry(i, X[i + 1].pow(2) + Y[i + 1].pow(2) - destim[i + 1].pow(2) + destim[0].pow(2))
+        for (i in 0 until (N - 1)) {
+            H.setEntry(i, 0, 2.0 * X[i + 1])
+            H.setEntry(i, 1, 2.0 * Y[i + 1])
+            val bi = X[i + 1].pow(2) + Y[i + 1].pow(2)
+            - destim[i + 1].pow(2) + destim[0].pow(2)
+            b.setEntry(i, 0, bi)
         }
 
-        // (H.' * H) matrisinin tersini al
-        val HTranspose = H.transpose()
-        val HTH = HTranspose.multiply(H)
-        val HTHInverse = LUDecomposition(HTH).solver.inverse
+        val Ht = H.transpose()
+        val HtH = Ht.multiply(H)
+        val invHtH = LUDecomposition(HtH).solver.inverse
+        val HtB = Ht.multiply(b)
+        val xZeroMat = invHtH.multiply(HtB)
 
-        // b vektörünü RealMatrix'e dönüştür
-        val bMatrix = MatrixUtils.createRealMatrix(N - 1, 1)
-        for (i in 0 until N - 1) {
-            bMatrix.setEntry(i, 0, b.getEntry(i))
-        }
-
-        // xzero hesapla: (inv(H.' * H)) * (H.' * b)
-        val temp = HTranspose.multiply(bMatrix)
-        val xzeroMatrix = HTHInverse.multiply(temp)
-
-        // Sonucu DoubleArray olarak döndür
-        return DoubleArray(xzeroMatrix.rowDimension) { xzeroMatrix.getEntry(it, 0) }
+        // Elde edilen (x, y)
+        val x = xZeroMat.getEntry(0, 0).coerceIn(0.1, 99.9)
+        val y = xZeroMat.getEntry(1, 0).coerceIn(0.1, 99.9)
+        return doubleArrayOf(x, y)
     }
 
+    /**
+     * MATLAB'teki "calcNewFormulaXestim" (yeni formül, Weighted LS)
+     * bir nevi "K" parametresi için
+     */
+    fun calcNewFormulaXestim(
+        Pr: DoubleArray,
+        X: DoubleArray,
+        Y: DoubleArray
+    ): DoubleArray {
+        val N = Pr.size
+        val H = Array2DRowRealMatrix(N - 1, 3)
+        val b = Array2DRowRealMatrix(N - 1, 1)
 
-    fun leastSquareTrackingWithC(X: DoubleArray, Y: DoubleArray, N: Int, xestim: DoubleArray, destim: DoubleArray, triallst: Int): DoubleArray {
+        for (i in 0 until (N - 1)) {
+            val factor = 10.0.pow((Pr[i + 1] - Pr[0]) / (5 * nreal))
+            H.setEntry(i, 0, 2.0 * factor * X[i + 1] - 2.0 * X[0])
+            H.setEntry(i, 1, 2.0 * factor * Y[i + 1] - 2.0 * Y[0])
+            H.setEntry(i, 2, 1 - factor)
+
+            val valB = factor * (X[i + 1].pow(2) + Y[i + 1].pow(2))
+            - (X[0].pow(2) + Y[0].pow(2))
+            b.setEntry(i, 0, valB)
+        }
+
+        val Ht = H.transpose()
+        val HtH = Ht.multiply(H)
+        val invHtH = LUDecomposition(HtH).solver.inverse
+        val HtB = Ht.multiply(b)
+        val xMat = invHtH.multiply(HtB)
+
+        val x = xMat.getEntry(0, 0).coerceIn(0.1, 99.9)
+        val y = xMat.getEntry(1, 0).coerceIn(0.1, 99.9)
+        return doubleArrayOf(x, y)
+    }
+
+    /**
+     * MATLAB'teki "least_square_tracking_with_C" (ERLAK)
+     * En önemli düzeltme: ksi[i] = (destim[i+1] - destim[i]) - (destimx[i+1] - destimx[i])
+     */
+    fun leastSquareTrackingWithC(
+        X: DoubleArray,
+        Y: DoubleArray,
+        N: Int,
+        xestim: DoubleArray,
+        destim: DoubleArray,
+        triallst: Int
+    ): DoubleArray {
         repeat(triallst) {
-            var x = xestim[0]
-            var y = xestim[1]
-
+            // 1) destimx
             val destimx = DoubleArray(N)
             for (i in 0 until N) {
-                destimx[i] = sqrt((X[i] - xestim[0]).pow(2) + (Y[i] - xestim[1]).pow(2))
+                val d = sqrt((X[i] - xestim[0]).pow(2) + (Y[i] - xestim[1]).pow(2))
+                destimx[i] = if (d < 1e-4) 1e-4 else d
             }
 
+            // 2) ksi
+            // DİKKAT: MATLAB'teki formülle aynı
             val ksi = DoubleArray(N - 1)
-            for (i in 0 until N - 1) {
+            for (i in 0 until (N - 1)) {
                 ksi[i] = (destim[i + 1] - destim[i]) - (destimx[i + 1] - destimx[i])
             }
 
+            // 3) cosalfa, sinalfa
             val cosalfa = DoubleArray(N)
             val sinalfa = DoubleArray(N)
             for (i in 0 until N) {
@@ -499,116 +390,135 @@ class FormulTestleri(val mContext: Context, val lineChart: LineChart) {
                 sinalfa[i] = (xestim[1] - Y[i]) / destimx[i]
             }
 
+            // 4) Htrack
             val Htrack = Array(N - 1) { DoubleArray(2) }
-            for (i in 0 until N - 1) {
+            for (i in 0 until (N - 1)) {
                 Htrack[i][0] = cosalfa[i + 1] - cosalfa[i]
                 Htrack[i][1] = sinalfa[i + 1] - sinalfa[i]
             }
 
-            val Vard = DoubleArray(N)
-            for (i in 0 until N) {
-                Vard[i] = destim[i].pow(2)
-            }
-
-            val C = Array(N - 1) { DoubleArray(N - 1) }
-            for (i in 0 until N - 1) {
-                for (j in 0 until N - 1) {
-                    C[i][j] = when {
-                        i == j -> Vard[i] + Vard[i + 1]
-                        i == j - 1 -> -Vard[i + 1]
-                        i == j + 1 -> -Vard[j + 1]
-                        else -> 0.0
+            // 5) C matrisi
+            val Vard = DoubleArray(N) { destim[it].pow(2) }
+            val C = Array(N - 1) { DoubleArray(N - 1) { 0.0 } }
+            for (i in 0 until (N - 1)) {
+                for (j in 0 until (N - 1)) {
+                    when {
+                        i == j     -> C[i][j] = Vard[i] + Vard[i + 1]
+                        i == j - 1 -> C[i][j] = -Vard[i + 1]
+                        i == j + 1 -> C[i][j] = -Vard[j + 1]
+                        else       -> C[i][j] = 0.0
                     }
                 }
             }
 
-            val HtrackMatrix: RealMatrix = Array2DRowRealMatrix(Htrack)
-            val CMatrix: RealMatrix = Array2DRowRealMatrix(C)
-            val ksiVector: RealVector = ArrayRealVector(ksi)
+            // 6) teta = inv(Htrack'^inv(C)*Htrack)* [ Htrack'^inv(C)*ksi ]
+            val HtrackMatrix = Array2DRowRealMatrix(Htrack)
+            val CMatrix = Array2DRowRealMatrix(C)
+            val ksiVector = ArrayRealVector(ksi)
 
-            val HtrackTranspose = HtrackMatrix.transpose()
-            val CInverse = LUDecomposition(CMatrix).solver.inverse
+            val Ht = HtrackMatrix.transpose()
+            val Cinv = try {
+                LUDecomposition(CMatrix).solver.inverse
+            } catch (ex: SingularMatrixException) {
+                Log.e("leastSquareTrackingWithC", "CMatrix singular, skip iteration", ex)
+                return xestim
+            }
 
-            // LUDecomposition kullanarak matrisin tersini almak
-            val thetaMatrix = HtrackTranspose.multiply(CInverse)
-                .multiply(HtrackMatrix)
-                .multiply(LUDecomposition(HtrackTranspose.multiply(CInverse).multiply(HtrackMatrix)).solver.inverse)
-                .multiply(HtrackTranspose)
-                .multiply(CInverse)
-                .multiply(MatrixUtils.createColumnRealMatrix(ksi))
+            val leftPart = Ht.multiply(Cinv).multiply(HtrackMatrix)
+            val leftInv = try {
+                LUDecomposition(leftPart).solver.inverse
+            } catch (ex: SingularMatrixException) {
+                Log.e("leastSquareTrackingWithC", "leftPart singular, skip iteration", ex)
+                return xestim
+            }
 
-            val xdelta = thetaMatrix.getEntry(0, 0)
-            val ydelta = thetaMatrix.getEntry(1, 0)
+            val rightPart = Ht.multiply(Cinv).operate(ksiVector)
+            val teta = leftInv.operate(rightPart)
 
+            val xdelta = teta.getEntry(0)
+            val ydelta = teta.getEntry(1)
+
+            // 7) xestim güncelle
             xestim[0] += xdelta
             xestim[1] += ydelta
+            xestim[0] = xestim[0].coerceIn(0.1, 99.9)
+            xestim[1] = xestim[1].coerceIn(0.1, 99.9)
 
-            xestim[0] = max(0.1, min(99.9, xestim[0]))
-            xestim[1] = max(0.1, min(99.9, xestim[1]))
-
+            // 8) destim güncelle
             for (i in 0 until N) {
-                destim[i] = destimx[i] + ((xestim[0] - X[i]) / destimx[i]) * xdelta + ((xestim[1] - Y[i]) / destimx[i]) * ydelta
+                destim[i] = destimx[i] +
+                        ((xestim[0] - X[i]) / destimx[i]) * xdelta +
+                        ((xestim[1] - Y[i]) / destimx[i]) * ydelta
             }
         }
-
         return xestim
     }
 
+    data class HistogramResult(val counts: IntArray, val centers: DoubleArray)
+
     fun getHistogram(data: DoubleArray, measuredCounts: Int): HistogramResult {
-        val counts = IntArray(measuredCounts) // Store the counts for each bin
-        val centers = DoubleArray(measuredCounts) // Store the centers of the bins
-        // Your histogram calculation logic here...
-        for (i in data.indices) {
-            val index = (data[i] / 10).toInt() // Example binning logic
-            if (index in counts.indices) {
-                counts[index]++
+        val counts = IntArray(measuredCounts)
+        val centers = DoubleArray(measuredCounts)
+        val binWidth = 100.0 / measuredCounts
+        for (value in data) {
+            val idx = (value / binWidth).toInt()
+            if (idx in counts.indices) {
+                counts[idx]++
+            } else if (idx >= measuredCounts) {
+                counts[measuredCounts - 1]++
             }
         }
         for (i in counts.indices) {
-            centers[i] = (i * 10).toDouble() // Adjust to correct bin center calculation
+            centers[i] = i * binWidth + binWidth / 2
         }
         return HistogramResult(counts, centers)
     }
 
-    // CDF Calculation
     fun getCdf(nelement: IntArray, measuredCounts: Int): DoubleArray {
         val cdf = DoubleArray(nelement.size)
-        cdf[0] = nelement[0].toDouble() / measuredCounts
-        for (i in 1 until nelement.size) {
-            cdf[i] = cdf[i - 1] + (nelement[i].toDouble() / measuredCounts)
+        var cumulative = 0.0
+        for (i in nelement.indices) {
+            cumulative += nelement[i]
+            cdf[i] = cumulative / measuredCounts.toDouble()
         }
         return cdf
     }
 
-    // Data class to hold histogram result
-    data class HistogramResult(val counts: IntArray, val centers: DoubleArray)
+    data class CenterCDFDataClass(val centersZero: DoubleArray,val cdfZero: DoubleArray,
+                val centersHyp:  DoubleArray, val cdfHyp:  DoubleArray,
+                val centersLst:  DoubleArray, val cdfLst:  DoubleArray){}
 
-    // Function to plot CDF chart using MPAndroidChart
-    fun plotCdfChart(
-        chart: LineChart,
+    /*fun plotCdfChart(
         centersZero: DoubleArray, cdfZero: DoubleArray,
-        centersHyp: DoubleArray, cdfHyp: DoubleArray,
-        centersLst: DoubleArray, cdfLst: DoubleArray
+        centersHyp:  DoubleArray, cdfHyp:  DoubleArray,
+        centersLst:  DoubleArray, cdfLst:  DoubleArray
     ) {
-        val dataSetZero = LineDataSet(cdfZero.mapIndexed { index, value -> Entry(centersZero[index].toFloat(), value.toFloat()) }, "Zero")
-        dataSetZero.color = Color.BLUE
-        dataSetZero.lineWidth = 2f
+        val entriesZero = centersZero.mapIndexed { idx, cx ->
+            Entry(cx.toFloat(), cdfZero[idx].toFloat())
+        }
+        val entriesHyp = centersHyp.mapIndexed { idx, cx ->
+            Entry(cx.toFloat(), cdfHyp[idx].toFloat())
+        }
+        val entriesLst = centersLst.mapIndexed { idx, cx ->
+            Entry(cx.toFloat(), cdfLst[idx].toFloat())
+        }
 
-        val dataSetHyp = LineDataSet(cdfHyp.mapIndexed { index, value -> Entry(centersHyp[index].toFloat(), value.toFloat()) }, "Hyp")
-        dataSetHyp.color = Color.GREEN
-        dataSetHyp.lineWidth = 2f
+        val dataSetZero = LineDataSet(entriesZero, "LS").apply {
+            color = Color.BLUE
+            lineWidth = 2f
+        }
+        val dataSetHyp = LineDataSet(entriesHyp, "WLS").apply {
+            color = Color.GREEN
+            lineWidth = 2f
+        }
+        val dataSetLst = LineDataSet(entriesLst, "ERLAK").apply {
+            color = Color.RED
+            lineWidth = 2f
+        }
 
-        val dataSetLst = LineDataSet(cdfLst.mapIndexed { index, value -> Entry(centersLst[index].toFloat(), value.toFloat()) }, "Lst")
-        dataSetLst.color = Color.RED
-        dataSetLst.lineWidth = 2f
-
-        val data = LineData(dataSetZero, dataSetHyp, dataSetLst)
-        chart.data = data
-        chart.invalidate() // Refresh the chart
-    }
-
-
-
-
-
+        val lineData = LineData(dataSetZero, dataSetHyp, dataSetLst)
+        chart.data = lineData
+        chart.description.text = "MS3 - CDF Plot"
+        chart.invalidate()
+    }*/
 }
