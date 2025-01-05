@@ -14,18 +14,16 @@ import com.github.mikephil.charting.data.LineDataSet
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet
 import com.wifianalyzer.wifianalyzerproject.databinding.FragmentFormulaTestBinding
 import com.wifianalyzer.wifianalyzerproject.formulaTest.FormulTestleri
-import com.wifianalyzer.wifianalyzerproject.ui.fragment.formulaTest.adapter.FormulaTestFragmentAdapter
 
 class FormulaTestFragment : Fragment() {
 
     private lateinit var binding: FragmentFormulaTestBinding
 
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        binding = FragmentFormulaTestBinding.inflate(inflater,container,false)
+        binding = FragmentFormulaTestBinding.inflate(inflater, container, false)
 
         binding.buttonTest.setOnClickListener {
 
@@ -39,12 +37,15 @@ class FormulaTestFragment : Fragment() {
             setupLineChartWithShapes(binding.lineChart,Xo, Yo, pointx, pointy)
 
             Log.e("Action","Buton tıklandı")
-            FormulTestleri(requireContext().applicationContext,binding.recyclerViewGraph).main()
+
+            // RecyclerView'i binding.recyclerViewGraph şeklinde FormulTestleri'ne gönderiyoruz
+            FormulTestleri(requireContext().applicationContext, binding.recyclerViewGraph).main()
 
         }
 
         return binding.root
     }
+
 
     fun setupLineChartWithShapes(
         lineChart: LineChart,
@@ -112,3 +113,5 @@ class FormulaTestFragment : Fragment() {
     }
 
 }
+}
+
