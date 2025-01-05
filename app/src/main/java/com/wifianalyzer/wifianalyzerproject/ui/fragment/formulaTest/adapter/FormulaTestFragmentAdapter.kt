@@ -2,6 +2,7 @@ package com.wifianalyzer.wifianalyzerproject.ui.fragment.formulaTest.adapter
 
 import android.content.Context
 import android.graphics.Color
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -32,9 +33,8 @@ class FormulaTestFragmentAdapter(
     }
 
     override fun onBindViewHolder(holder: CardHolder, position: Int) {
-        for (i in centerCDF){
-            drawGraph(holder,i,itemCount)
-        }
+        val item = centerCDF[position]
+        drawGraph(holder,item,position+1)
     }
 
     fun drawGraph(holder: CardHolder, data: FormulTestleri.CenterCDFDataClass, itemCount: Int,){
