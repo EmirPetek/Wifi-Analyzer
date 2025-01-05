@@ -2,6 +2,7 @@ package com.wifianalyzer.wifianalyzerproject.ui.fragment.formulaTest.adapter
 
 import android.content.Context
 import android.graphics.Color
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -32,10 +33,10 @@ class FormulaTestFragmentAdapter(
     }
 
     override fun onBindViewHolder(holder: CardHolder, position: Int) {
+
         // Yalnızca o satıra (position) özgü centerCDF verisini alıyoruz
         val item = centerCDF[position]
         // position+1 => MS1..MS7 arası numaralandırma isterseniz
-        drawGraph(holder, item, position + 1)
     }
 
     /**

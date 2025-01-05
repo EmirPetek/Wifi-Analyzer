@@ -5,6 +5,12 @@ import android.util.Log
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.wifianalyzer.wifianalyzerproject.ui.fragment.formulaTest.adapter.FormulaTestFragmentAdapter
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.apache.commons.math3.linear.*
 import kotlin.math.log10
 import kotlin.math.pow
@@ -36,6 +42,8 @@ class FormulTestleri(
 
         val centerCdfArraylist = ArrayList<CenterCDFDataClass>()
         private lateinit var adapter: FormulaTestFragmentAdapter
+        private var isAnalysisCompleted = false
+        private var isAnalysisCompletedCounter = 0
 
     }
 
@@ -78,15 +86,22 @@ class FormulTestleri(
         // 2) 3D dizi (7x10x1000)
         val mValues = convertTo3D(measured_points, AP_number, measured_counts, Prs)
 
-
+/*
         // N tane ölçüm noktalarını yazdır.
-        for (ms in 0..<measured_points) {
-            loopBeginsForSingleMS(ms,measured_counts,AP_number,mValues)
+        CoroutineScope(Dispatchers.Main).launch {
+            for (ms in 0 until measured_points) {
+                val result = async(Dispatchers.Main) {
+                    loopBeginsForSingleMS(ms, measured_counts, AP_number, mValues)
+                }.await() // İşlemin tamamlanmasını bekle
+                // Gerekirse burada işlem sonucu ile başka bir işlem yapabilirsiniz
+            }
+        }*/
+
+        for (ms in 0 until measured_points) {
+            loopBeginsForSingleMS(ms, measured_counts, AP_number, mValues)
         }
 
-
-
-        //loopBeginsForSingleMS(5,measured_counts,AP_number,mValues)
+        //loopBeginsForSingleMS(1,measured_counts,AP_number,mValues)
 
         // 3) Yalnızca MS3 (fiteration=2) için hesaplama ve CDF plot
        /* loopBeginsForSingleMS(
@@ -226,11 +241,10 @@ class FormulTestleri(
         // ekranda 7 tane farklı grafik çıkamsı beklenirken 7 tane aynı çıkıyor.
 
         centerCdfArraylist.add(centerCDF)
-        Log.e("eklenen cdf: ", centerCDF.toString())
-        Log.e("karşılaştırma: ","centercdfsize: ${centerCdfArraylist.size} ve msindex: $msIndex")
-        //for (c in histHyp.centers) Log.e("centercdf: ", c.toString())
+        isAnalysisCompleted = true
+        isAnalysisCompletedCounter++
+
         if (centerCdfArraylist.size == pointx.size){
-            Log.e("kjsdfşks","buraya girdi")
             recyclerViewGraph.setHasFixedSize(true)
             recyclerViewGraph.layoutManager = LinearLayoutManager(mContext)
             adapter = FormulaTestFragmentAdapter(mContext, centerCdfArraylist)
