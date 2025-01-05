@@ -19,7 +19,7 @@ import androidx.core.content.ContextCompat
 import androidx.navigation.fragment.findNavController
 import com.wifianalyzer.wifianalyzerproject.databinding.FragmentCurrentWifiInformationBinding
 import com.wifianalyzer.wifianalyzerproject.ui.activityDeprecated.CurrentWifiInformation
-import com.wifianalyzer.wifianalyzerproject.util.CalculateHyperbolicAlgorithm
+//import com.wifianalyzer.wifianalyzerproject.util.CalculateHyperbolicAlgorithm
 
 class CurrentWifiInformationFragment : Fragment() {
 
@@ -56,8 +56,8 @@ class CurrentWifiInformationFragment : Fragment() {
             val etNumOfAP = binding.editTextAPNumber.text.toString().toInt()
             val etDestim = binding.editTextDestim.text.toString().toDouble()
 
-            val res = CalculateHyperbolicAlgorithm().hyperbolicAlgorithmSingle(etX,etY,etNumOfAP,etDestim)
-            binding.textViewHyperbolicLocation.text = res.toString()
+            //val res = CalculateHyperbolicAlgorithm().hyperbolicAlgorithmSingle(etX,etY,etNumOfAP,etDestim)
+            //binding.textViewHyperbolicLocation.text = res.toString()
 
         }
 

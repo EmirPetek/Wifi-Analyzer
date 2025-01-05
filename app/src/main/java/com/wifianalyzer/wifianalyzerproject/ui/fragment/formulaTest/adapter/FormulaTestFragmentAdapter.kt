@@ -14,16 +14,16 @@ import com.wifianalyzer.wifianalyzerproject.R
 import com.wifianalyzer.wifianalyzerproject.formulaTest.FormulTestleri
 
 class FormulaTestFragmentAdapter(
-    val mContext:Context,
-    val centerCDF: ArrayList<FormulTestleri.CenterCDFDataClass>
-): RecyclerView.Adapter<FormulaTestFragmentAdapter.CardHolder>() {
+    private val mContext: Context,
+    private val centerCDF: ArrayList<FormulTestleri.CenterCDFDataClass>
+) : RecyclerView.Adapter<FormulaTestFragmentAdapter.CardHolder>() {
 
-    inner class CardHolder(view: View) : RecyclerView.ViewHolder(view){
+    inner class CardHolder(view: View) : RecyclerView.ViewHolder(view) {
         val lineChart: LineChart = view.findViewById(R.id.lineChart)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CardHolder {
-        val view = LayoutInflater.from(mContext).inflate(R.layout.card_graph_measuring,parent,false)
+        val view = LayoutInflater.from(mContext).inflate(R.layout.card_graph_measuring, parent, false)
         return CardHolder(view)
     }
 
@@ -32,12 +32,22 @@ class FormulaTestFragmentAdapter(
     }
 
     override fun onBindViewHolder(holder: CardHolder, position: Int) {
-        for (i in centerCDF){
-            drawGraph(holder,i,itemCount)
-        }
+        // Yalnızca o satıra (position) özgü centerCDF verisini alıyoruz
+        val item = centerCDF[position]
+        // position+1 => MS1..MS7 arası numaralandırma isterseniz
+        drawGraph(holder, item, position + 1)
     }
 
-    fun drawGraph(holder: CardHolder, data: FormulTestleri.CenterCDFDataClass, itemCount: Int,){
+    /**
+     * Bir ölçüm noktasının (CenterCDFDataClass) verilerini ilgili satırdaki lineChart'a çizdirir.
+     * @param msIndex opsiyonel, grafiğin açıklamasında (description) "MS{msIndex}" yazmak için.
+     */
+    private fun drawGraph(
+        holder: CardHolder,
+        data: FormulTestleri.CenterCDFDataClass,
+        msIndex: Int
+    ) {
+        // 1) Verileri Entry listesine dönüştürelim
         val entriesZero = data.centersZero.mapIndexed { idx, cx ->
             Entry(cx.toFloat(), data.cdfZero[idx].toFloat())
         }
@@ -48,6 +58,7 @@ class FormulaTestFragmentAdapter(
             Entry(cx.toFloat(), data.cdfLst[idx].toFloat())
         }
 
+        // 2) DataSet'leri oluştur
         val dataSetZero = LineDataSet(entriesZero, "LS").apply {
             color = Color.BLUE
             lineWidth = 2f
@@ -61,13 +72,12 @@ class FormulaTestFragmentAdapter(
             lineWidth = 2f
         }
 
+        // 3) LineData'ya ekle
         val lineData = LineData(dataSetZero, dataSetHyp, dataSetLst)
+
         holder.lineChart.data = lineData
-        holder.lineChart.description.text = "MS$itemCount - CDF Plot"
+        // Grafiğin açıklamasında hangi measurement point olduğunu gösterebilirsiniz
+        holder.lineChart.description.text = "MS$msIndex - CDF Plot"
         holder.lineChart.invalidate()
     }
-
-
-
-
 }
