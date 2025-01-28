@@ -259,7 +259,7 @@ class FormulTestleri(
     /**
      * MATLAB'teki hyperbolic_algorithm fonksiyonuna denk
      */
-    fun hyperbolicAlgorithm(
+    /*fun hyperbolicAlgorithm(
         X: DoubleArray,
         Y: DoubleArray,
         N: Int,
@@ -300,7 +300,58 @@ class FormulTestleri(
         val x = xEstVec.getEntry(0).coerceIn(0.1, 99.9)
         val y = xEstVec.getEntry(1).coerceIn(0.1, 99.9)
         return doubleArrayOf(x, y)
+    }*/
+
+    fun hyperbolicAlgorithm(
+        X: DoubleArray,
+        Y: DoubleArray,
+        N: Int,
+        destim: DoubleArray
+    ): DoubleArray {
+        val H = Array2DRowRealMatrix(N - 1, 2)
+        val b = Array2DRowRealMatrix(N - 1, 1)
+
+        for (i in 0 until N - 1) {
+            H.setEntry(i, 0, 2.0 * X[i + 1])
+            H.setEntry(i, 1, 2.0 * Y[i + 1])
+            val bi = X[i + 1].pow(2) + Y[i + 1].pow(2) - destim[i + 1].pow(2) + destim[0].pow(2)
+            b.setEntry(i, 0, bi)
+        }
+
+        val Vard = DoubleArray(N) { destim[it].pow(4) }
+        val S = Array2DRowRealMatrix(N - 1, N - 1)
+        for (i in 0 until N - 1) {
+            for (j in 0 until N - 1) {
+                S.setEntry(
+                    i, j, if (i == j) Vard[0] + Vard[i + 1] else Vard[0]
+                )
+            }
+        }
+
+        val Ht = H.transpose()
+        val Sinv = try {
+            LUDecomposition(S).solver.inverse
+        } catch (e: SingularMatrixException) {
+            throw RuntimeException("Matrix S is singular and cannot be inverted", e)
+        }
+
+        val bVector = b.getColumnVector(0) // b'yi RealVector'e dönüştür
+        val M1 = Ht.multiply(Sinv).multiply(H)
+        val M1inv = try {
+            LUDecomposition(M1).solver.inverse
+        } catch (e: SingularMatrixException) {
+            throw RuntimeException("Matrix M1 is singular and cannot be inverted", e)
+        }
+        val v1 = Ht.multiply(Sinv).operate(bVector) // RealVector ile çalış
+        val xEstVec = M1inv.operate(v1)
+
+        val x = xEstVec.getEntry(0).coerceIn(0.1, 99.9)
+        val y = xEstVec.getEntry(1).coerceIn(0.1, 99.9)
+
+        return doubleArrayOf(x, y)
     }
+
+
 
     /**
      * MATLAB'teki least_square_algorithm fonksiyonuna denk
@@ -317,8 +368,8 @@ class FormulTestleri(
         for (i in 0 until (N - 1)) {
             H.setEntry(i, 0, 2.0 * X[i + 1])
             H.setEntry(i, 1, 2.0 * Y[i + 1])
-            val bi = X[i + 1].pow(2) + Y[i + 1].pow(2)
-            - destim[i + 1].pow(2) + destim[0].pow(2)
+            val bi = X[i + 1].pow(2) + Y[i + 1].pow(2) -
+                    destim[i + 1].pow(2) + destim[0].pow(2)
             b.setEntry(i, 0, bi)
         }
 
@@ -373,7 +424,104 @@ class FormulTestleri(
      * MATLAB'teki "least_square_tracking_with_C" (ERLAK)
      * En önemli düzeltme: ksi[i] = (destim[i+1] - destim[i]) - (destimx[i+1] - destimx[i])
      */
+
     fun leastSquareTrackingWithC(
+        X: DoubleArray,
+        Y: DoubleArray,
+        N: Int,
+        xestim: DoubleArray,
+        destim: DoubleArray,
+        triallst: Int
+    ): DoubleArray {
+        val xEstimation = xestim.copyOf() // xestim güncellenebilir, orijinali koruyoruz
+
+        repeat(triallst) {
+            // 1. Mevcut mesafe tahminlerini (destimx) hesapla
+            val destimx = DoubleArray(N) { i ->
+                sqrt((X[i] - xEstimation[0]).pow(2) + (Y[i] - xEstimation[1]).pow(2))
+            }
+
+            // 2. Ksi hesaplama (DoubleArray olarak oluşturuluyor)
+            val ksi = DoubleArray(N - 1) { i ->
+                (destim[i + 1] - destim[i]) - (destimx[i + 1] - destimx[i])
+            }
+
+            // DoubleArray -> Array2DRowRealMatrix (N-1 x 1 boyutlu matris)
+            val ksiMatrix = Array2DRowRealMatrix(N - 1, 1)
+            for (i in ksi.indices) {
+                ksiMatrix.setEntry(i, 0, ksi[i]) // Her değeri matrisin 0. sütununa ekliyoruz
+            }
+
+
+            // 3. cosalfa ve sinalfa hesaplama
+            val cosalfa = DoubleArray(N) { i -> (xEstimation[0] - X[i]) / destimx[i] }
+            val sinalfa = DoubleArray(N) { i -> (xEstimation[1] - Y[i]) / destimx[i] }
+
+            // 4. Htrack matrisini oluşturma
+            val Htrack = Array2DRowRealMatrix(N - 1, 2)
+            for (i in 0 until N - 1) {
+                Htrack.setEntry(i, 0, cosalfa[i + 1] - cosalfa[i])
+                Htrack.setEntry(i, 1, sinalfa[i + 1] - sinalfa[i])
+            }
+
+            // 5. C matrisi oluşturma
+            val Vard = DoubleArray(N) { destim[it].pow(2) }
+            val C = Array2DRowRealMatrix(N - 1, N - 1)
+            for (i in 0 until N - 1) {
+                for (j in 0 until N - 1) {
+                    C.setEntry(
+                        i, j,
+                        when {
+                            i == j -> Vard[i] + Vard[i + 1]
+                            i == j - 1 -> -Vard[i + 1]
+                            i == j + 1 -> -Vard[j + 1]
+                            else -> 0.0
+                        }
+                    )
+                }
+            }
+
+            // 6. teta hesaplama
+            val Ht = Htrack.transpose()
+            val Cinv = try {
+                LUDecomposition(C).solver.inverse
+            } catch (e: SingularMatrixException) {
+                throw RuntimeException("Matrix C is singular and cannot be inverted", e)
+            }
+
+            val teta = try {
+                val left = Ht.multiply(Cinv).multiply(Htrack)
+                val leftInv = LUDecomposition(left).solver.inverse
+                val right = Ht.multiply(Cinv).operate(ArrayRealVector(ksi))
+                leftInv.operate(right)
+            } catch (e: SingularMatrixException) {
+                throw RuntimeException("Matrix inversion failed in teta calculation", e)
+            }
+
+            // 7. xdelta ve ydelta hesaplama
+            val tetaArray = teta.toArray()
+            val xdelta = tetaArray[0]
+            val ydelta = tetaArray[1]
+
+
+            // 8. xestim güncelleme
+            xEstimation[0] = (xEstimation[0] + xdelta).coerceIn(0.1, 99.9)
+            xEstimation[1] = (xEstimation[1] + ydelta).coerceIn(0.1, 99.9)
+
+            // 9. Yeni mesafe tahmini (destim) güncelleme
+            for (i in 0 until N) {
+                destim[i] = destimx[i] +
+                        ((xEstimation[0] - X[i]) / destimx[i]) * xdelta +
+                        ((xEstimation[1] - Y[i]) / destimx[i]) * ydelta
+            }
+        }
+
+        return xEstimation
+    }
+
+
+
+    /*fun leastSquareTrackingWithC(
         X: DoubleArray,
         Y: DoubleArray,
         N: Int,
@@ -466,7 +614,7 @@ class FormulTestleri(
             }
         }
         return xestim
-    }
+    }*/
 
     data class HistogramResult(val counts: IntArray, val centers: DoubleArray)
 
