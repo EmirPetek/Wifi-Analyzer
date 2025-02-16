@@ -3,6 +3,7 @@ package com.wifianalyzer.wifianalyzerproject.data
 import com.google.firebase.database.IgnoreExtraProperties
 import com.wifianalyzer.wifianalyzerproject.data.sensor.SensorAccelerometer
 import com.wifianalyzer.wifianalyzerproject.data.sensor.SensorGyroscope
+import java.io.File
 import java.io.Serializable
 
 @IgnoreExtraProperties
@@ -16,7 +17,10 @@ data class RssiSignalData(
     val sensorAccelerometer: SensorAccelerometer? = null,
     val sensorGyroscope: SensorGyroscope? = null,
     val wifiStandart: String? = null,
-    val mcResponder_802_11: String? = null
+    val mcResponder_802_11: String? = null,
+    val folderName : String? = null,
+    val directory : File? = null,
+    val deviceLocation: DeviceLocation? = null
     ) : Serializable {
 
 

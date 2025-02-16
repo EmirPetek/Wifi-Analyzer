@@ -44,7 +44,7 @@ class AroundWifiResultsDateAdapter(
 
 
             val bundle = Bundle().apply {  putString("unixtimestamp",result[position].toString()) }
-            Navigation.findNavController(it).navigate(R.id.action_aroundWifiResultsDate_to_aroundWifiResultsList,bundle)
+            Navigation.findNavController(it).navigate(R.id.action_aroundWifiResultsDate_to_aroundWifiInformationDeviceResult,bundle)
 
            /* val intent = Intent(context, AroundWifiResultsList::class.java)
            intent.putExtra("unixtimestamp",result[position].toString())
