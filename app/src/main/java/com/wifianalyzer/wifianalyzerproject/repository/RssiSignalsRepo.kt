@@ -1,5 +1,7 @@
 package com.wifianalyzer.wifianalyzerproject.repository
 
+import android.content.Context
+import android.os.Environment
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import com.google.firebase.database.DataSnapshot
@@ -8,6 +10,9 @@ import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import com.wifianalyzer.wifianalyzerproject.data.RssiSignalData
 import com.wifianalyzer.wifianalyzerproject.repository.`interface`.rssiSignalRepoFunctions
+import java.io.File
+import java.io.FileWriter
+import java.io.IOException
 
 
 class RssiSignalsRepo : rssiSignalRepoFunctions{
@@ -21,11 +26,116 @@ class RssiSignalsRepo : rssiSignalRepoFunctions{
     val dbRefRssiSignal = FirebaseDatabase.getInstance().getReference("rssiSignals")
 
      override fun insertRssiSignal(obj: RssiSignalData, userkey: String, unixtimestamp: Long){
-        val db = dbRefRssiSignal.child(userkey).child(unixtimestamp.toString())
+        /*val db = dbRefRssiSignal.child(userkey).child(unixtimestamp.toString())
         db.push().setValue(obj).addOnFailureListener { it ->
             Log.e("hata: ", it.toString())
+        }*/
+
+         val fileName = "${obj.ssid}&${obj.bssid!!.replace(":","-")}.txt"
+         val file = File(obj.directory,fileName)
+
+         Log.e("file: ", file.toString())
+         Log.e("fileExist: ", file.exists().toString())
+
+         // Eğer dosya yoksa oluştur
+         if (!file.exists()) {
+             val isFileCreated = file.createNewFile()
+             if (!isFileCreated) {
+                 throw IOException("Dosya oluşturulamadı!")
+             }
+         }
+
+
+         val fileWriter = FileWriter(file,true)
+         val data = "" +
+                 "${obj.rssi}," +
+                 "${obj.sensorAccelerometer!!.x},${obj.sensorAccelerometer.y},${obj.sensorAccelerometer.z}," +
+                 "${obj.sensorGyroscope!!.x},${obj.sensorGyroscope.y},${obj.sensorGyroscope.z}," +
+                 "${obj.deviceLocation!!.x},${obj.deviceLocation.y},${obj.deviceLocation.z},"
+
+         fileWriter.append(data+"\n")
+         fileWriter.close()
+
+
+    }
+
+    fun listFolders(context: Context): List<String> {
+        // 📂 Uygulamanın özel dosya dizinini al
+        val directory = context.getExternalFilesDir(null)
+
+        // Eğer dizin erişilebilir değilse veya yoksa boş liste döndür
+        if (directory == null || !directory.exists()) {
+            return emptyList()
+        }
+        Log.e("directory: ", directory.toString())
+
+        // 📂 Dosyaları listele (sadece dosya isimlerini al)
+        return directory.listFiles()?.map { it.name } ?: emptyList()
+    }
+
+    fun listTxtFiles(folderName: String, context: Context): List<String> {
+        // 📂 Uygulamanın özel dosya dizinini al
+        val parentDir = context.getExternalFilesDir(null)
+
+        // Eğer dizin erişilebilir değilse veya yoksa boş liste döndür
+        if (parentDir == null || !parentDir.exists()) {
+            return listOf("Ana dizin bulunamadı!")
+        }
+
+        // Alt dizinin yolunu oluştur
+        val targetDir = File(parentDir, folderName)
+
+        // Eğer belirtilen alt dizin yoksa veya bir dizin değilse boş liste döndür
+        if (!targetDir.exists() || !targetDir.isDirectory) {
+            return listOf("Belirtilen alt dizin bulunamadı!")
+        }
+
+        Log.e("Target Directory", targetDir.absolutePath)
+
+        // Sadece `.txt` uzantılı dosyaları filtreleyerek listele
+        return targetDir.listFiles()
+            ?.filter { it.isFile && it.extension == "txt" }
+            ?.map { it.name }
+            ?: listOf("Dizin boş veya .txt dosyası yok!")
+    }
+
+
+    fun readFromFile(context: Context, folderName: String, txtFileName: String): String {
+        return try {
+            // 📂 Uygulamanın özel dosya dizinini al
+            val parentDir = context.getExternalFilesDir(null)
+
+            // Eğer ana dizin yoksa hata mesajı döndür
+            if (parentDir == null || !parentDir.exists()) {
+                return "Ana dizin bulunamadı!"
+            }
+
+            // 📁 Alt dizini belirle
+            val directory = File(parentDir, folderName)
+
+            // Eğer belirtilen alt dizin yoksa veya klasör değilse hata mesajı döndür
+            if (!directory.exists() || !directory.isDirectory) {
+                return "Alt dizin bulunamadı!"
+            }
+
+            // 📄 Okunacak dosyayı belirle
+            val file = File(directory, txtFileName)
+
+            Log.e("File Path", file.absolutePath) // Log ile dosya yolunu kontrol edebilirsin
+
+            // Eğer dosya varsa içeriğini oku, yoksa hata mesajı döndür
+            if (file.exists()) {
+                file.readText()
+            } else {
+                "Dosya bulunamadı!"
+            }
+        } catch (e: IOException) {
+            e.printStackTrace()
+            "Dosya okunamadı!"
         }
     }
+
+
 
     override fun getRssiUnixtsListData(userkey: String){
         Log.e("userkey", userkey)

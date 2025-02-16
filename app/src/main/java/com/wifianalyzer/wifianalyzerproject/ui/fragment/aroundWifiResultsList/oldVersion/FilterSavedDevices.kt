@@ -1,4 +1,4 @@
-package com.wifianalyzer.wifianalyzerproject.ui.fragment.aroundWifiResultsList
+package com.wifianalyzer.wifianalyzerproject.ui.fragment.aroundWifiResultsList.oldVersion
 
 import androidx.fragment.app.viewModels
 import android.os.Bundle

@@ -41,12 +41,12 @@
         android:label="fragment_around_wifi_results_date"
         tools:layout="@layout/fragment_around_wifi_results_date" >
         <action
-            android:id="@+id/action_aroundWifiResultsDate_to_aroundWifiResultsList"
-            app:destination="@id/aroundWifiResultsList" />
+            android:id="@+id/action_aroundWifiResultsDate_to_aroundWifiInformationDeviceResult"
+            app:destination="@id/aroundWifiInformationDeviceResult" />
     </fragment>
     <fragment
         android:id="@+id/aroundWifiResultsList"
-        android:name="com.wifianalyzer.wifianalyzerproject.ui.fragment.aroundWifiResultsList.AroundWifiResultsList"
+        android:name="com.wifianalyzer.wifianalyzerproject.ui.fragment.aroundWifiResultsList.oldVersion.AroundWifiResultsList"
         android:label="fragment_around_wifi_results_list"
         tools:layout="@layout/fragment_around_wifi_results_list" >
         <action
@@ -55,7 +55,7 @@
     </fragment>
     <fragment
         android:id="@+id/filterSavedDevices"
-        android:name="com.wifianalyzer.wifianalyzerproject.ui.fragment.aroundWifiResultsList.FilterSavedDevices"
+        android:name="com.wifianalyzer.wifianalyzerproject.ui.fragment.aroundWifiResultsList.oldVersion.FilterSavedDevices"
         android:label="fragment_filter_saved_devices"
         tools:layout="@layout/fragment_filter_saved_devices" >
         <action
@@ -72,4 +72,18 @@
         android:name="com.wifianalyzer.wifianalyzerproject.ui.fragment.formulaTest.FormulaTestFragment"
         android:label="fragment_formula_test"
         tools:layout="@layout/fragment_formula_test" />
+    <fragment
+        android:id="@+id/aroundWifiInformationDeviceResult"
+        android:name="com.wifianalyzer.wifianalyzerproject.ui.fragment.aroundWifiResultsList.newVersion.AroundWifiInformationResultDevice"
+        android:label="fragment_around_wifi_information_device_result"
+        tools:layout="@layout/fragment_around_wifi_information_device_result" >
+        <action
+            android:id="@+id/action_aroundWifiInformationDeviceResult_to_aroundWifiInformationMeasurementResultList"
+            app:destination="@id/aroundWifiInformationMeasurementResultList" />
+    </fragment>
+    <fragment
+        android:id="@+id/aroundWifiInformationMeasurementResultList"
+        android:name="com.wifianalyzer.wifianalyzerproject.ui.fragment.aroundWifiResultsList.newVersion.AroundWifiInformationMeasurementResultList"
+        android:label="fragment_around_wifi_information_measurement_result_list"
+        tools:layout="@layout/fragment_around_wifi_information_measurement_result_list" />
 </navigation>

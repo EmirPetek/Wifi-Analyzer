@@ -12,6 +12,7 @@ import android.net.wifi.WifiManager
 import android.os.Build
 import androidx.fragment.app.viewModels
 import android.os.Bundle
+import android.os.Environment
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
@@ -29,6 +30,7 @@ import androidx.core.content.ContextCompat
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.wifianalyzer.wifianalyzerproject.R
+import com.wifianalyzer.wifianalyzerproject.data.DeviceLocation
 import com.wifianalyzer.wifianalyzerproject.data.RssiSignalData
 import com.wifianalyzer.wifianalyzerproject.data.sensor.SensorAccelerometer
 import com.wifianalyzer.wifianalyzerproject.data.sensor.SensorGyroscope
@@ -41,6 +43,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
+import java.io.File
 import java.util.Timer
 import java.util.TimerTask
 
@@ -63,6 +66,10 @@ class AroundWifiInformation : Fragment() {
     private var isStartedScan = 0 // 0 hiç başlatılmamış / durdurulmuş halde, 1 başlatılmış
     var timer = Timer()
     var unixtimestamp : Long = System.currentTimeMillis()
+    var folderName : String = ""
+    lateinit var directory: File
+
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -209,6 +216,7 @@ class AroundWifiInformation : Fragment() {
                 //Log.e("AnotherClass", "Accelerometer - x: ${accelerometerObj.x}, y: ${accelerometerObj.y}, z: ${accelerometerObj.z}")
                 //Log.e("AnotherClass", "Gyroscope - x: ${gyroscopeObj.x}, y: ${gyroscopeObj.y}, z: ${gyroscopeObj.z}")
 
+                val deviceLocation = DeviceLocation(0.0f,0.0f,0.0f)
                 // Gelen sonuçları veritabanına kaydetme işlemi
                 for (it in results) {
                     rssiObjList = RssiSignalData(
@@ -221,7 +229,10 @@ class AroundWifiInformation : Fragment() {
                         accelerometerObj,
                         gyroscopeObj,
                         determineStandart(it.wifiStandard),
-                        it.is80211mcResponder.toString()
+                        it.is80211mcResponder.toString(),
+                        folderName,
+                        directory,
+                        deviceLocation
                     )
                     //Log.e("veritabanı: ",  "dbye kaydedildi")
 
@@ -283,6 +294,16 @@ class AroundWifiInformation : Fragment() {
             duration = etDuration.text.toString().toInt()
             interval = etInterval.text.toString().toInt()
             location = etLocation.text.toString()
+
+            // txt dizininde ölçümün yapıldığı zamanın dosya adı, txtler bu dosya içine kaydediecek.
+            folderName = System.currentTimeMillis().toString()
+            Log.e("directoryName =" , folderName)
+            directory = File(requireContext().getExternalFilesDir(null), folderName)
+
+            // Eğer klasör yoksa oluştur
+            if (!directory.exists()) {
+                directory.mkdirs()
+            }
 
             period = ((duration * 60) / interval)
             totalPeriod = period

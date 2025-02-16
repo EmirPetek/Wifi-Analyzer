@@ -32,7 +32,7 @@ class AroundWifiResultsDate : Fragment() {
         userKey = sharedPreferences.getString("userKey", "0")!!
 
         binding.progressBarAroundWifiResultsDate.visibility = View.VISIBLE
-        viewModel.getRssiUnixtsListData(userKey)
+        viewModel.getRssiUnixtsListData(requireContext())
         viewModel.rssiSignalUnixtsList.observe(viewLifecycleOwner, Observer {
             binding.recyclerViewAroundWifiResultsDate.setHasFixedSize(true)
             binding.recyclerViewAroundWifiResultsDate.layoutManager = LinearLayoutManager(requireContext())
