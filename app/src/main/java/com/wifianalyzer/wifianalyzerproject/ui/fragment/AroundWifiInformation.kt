@@ -69,6 +69,10 @@ class AroundWifiInformation : Fragment() {
     var folderName : String = ""
     lateinit var directory: File
 
+    var deviceLocationX = 0.0f
+    var deviceLocationY = 0.0f
+    var deviceLocationZ = 0.0f
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -216,7 +220,9 @@ class AroundWifiInformation : Fragment() {
                 //Log.e("AnotherClass", "Accelerometer - x: ${accelerometerObj.x}, y: ${accelerometerObj.y}, z: ${accelerometerObj.z}")
                 //Log.e("AnotherClass", "Gyroscope - x: ${gyroscopeObj.x}, y: ${gyroscopeObj.y}, z: ${gyroscopeObj.z}")
 
-                val deviceLocation = DeviceLocation(0.0f,0.0f,0.0f)
+
+
+                val deviceLocation = DeviceLocation(deviceLocationX,deviceLocationY,deviceLocationZ)
                 // Gelen sonuçları veritabanına kaydetme işlemi
                 for (it in results) {
                     rssiObjList = RssiSignalData(
@@ -282,6 +288,9 @@ class AroundWifiInformation : Fragment() {
         val etDuration = dialogView.findViewById<android.widget.EditText>(R.id.etDuration)
         val etInterval = dialogView.findViewById<android.widget.EditText>(R.id.etInterval)
         val etLocation = dialogView.findViewById<android.widget.EditText>(R.id.etLocation)
+        val etDeviceLocationX = dialogView.findViewById<android.widget.EditText>(R.id.etDeviceLocationX)
+        val etDeviceLocationY = dialogView.findViewById<android.widget.EditText>(R.id.etDeviceLocationY)
+        val etDeviceLocationZ = dialogView.findViewById<android.widget.EditText>(R.id.etDeviceLocationZ)
         val btnCancel = dialogView.findViewById<Button>(R.id.btnCancel)
         val btnOk = dialogView.findViewById<Button>(R.id.btnOk)
 
@@ -294,6 +303,11 @@ class AroundWifiInformation : Fragment() {
             duration = etDuration.text.toString().toInt()
             interval = etInterval.text.toString().toInt()
             location = etLocation.text.toString()
+
+
+            deviceLocationX = etDeviceLocationX.text.toString().toFloatOrNull() ?: 0.0f
+            deviceLocationY = etDeviceLocationY.text.toString().toFloatOrNull() ?: 0.0f
+            deviceLocationZ = etDeviceLocationZ.text.toString().toFloatOrNull() ?: 0.0f
 
             // txt dizininde ölçümün yapıldığı zamanın dosya adı, txtler bu dosya içine kaydediecek.
             folderName = System.currentTimeMillis().toString()

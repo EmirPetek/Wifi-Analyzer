@@ -46,6 +46,49 @@
         android:textColor="#000000"
         android:textColorHint="#5A5757" />
 
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center|start"
+        android:orientation="horizontal">
+
+        <EditText
+            android:id="@+id/etDeviceLocationX"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+
+            android:hint="Tel. Konum X"
+            android:inputType="number|numberDecimal"
+            android:paddingBottom="16dp"
+            android:textColor="#000000"
+            android:textColorHint="#5A5757" />
+
+        <EditText
+            android:id="@+id/etDeviceLocationY"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:hint="Tel. Konum Y"
+            android:inputType="number|numberDecimal"
+            android:paddingBottom="16dp"
+            android:textColor="#000000"
+            android:textColorHint="#5A5757" />
+
+        <EditText
+            android:id="@+id/etDeviceLocationZ"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:hint="Tel. Konum Z"
+            android:inputType="number|numberDecimal"
+            android:paddingBottom="16dp"
+            android:textColor="#000000"
+            android:textColorHint="#5A5757" />
+
+    </LinearLayout>
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
