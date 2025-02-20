@@ -13,6 +13,7 @@ import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet
 import com.wifianalyzer.wifianalyzerproject.databinding.FragmentFormulaTestBinding
+import com.wifianalyzer.wifianalyzerproject.formulaTest.ERLAKCalculator
 import com.wifianalyzer.wifianalyzerproject.formulaTest.FormulTestleri
 
 class FormulaTestFragment : Fragment() {
@@ -24,6 +25,36 @@ class FormulaTestFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         binding = FragmentFormulaTestBinding.inflate(inflater, container, false)
+
+
+        binding.buttonErlakTest.setOnClickListener {
+            // Örnek kullanım
+            val rssiValues = doubleArrayOf(-48.0,-44.0,-72.0,-49.0,-64.0,-73.0,-69.0,-77.0,-83.0,-93.0) // AP sayısı kadar
+            val apCoords = arrayOf(
+                Pair(5.8, 0.35),
+                Pair(8.5, 12.0),
+                Pair(14.1, 2.55),
+                Pair(18.15, 11.70),
+                Pair(27.55, 3.30),
+                Pair(32.20, 10.40),
+                Pair(41.15, 0.35),
+                Pair(50.05, 0.35),
+                Pair(45.95, 12.00),
+                Pair(61.80, 0.75),
+            )
+
+// Tek fonksiyonla konum hesapla:
+            val estimatedXY = ERLAKCalculator.estimateRealTimeLocation(
+                rssiValues,
+                apCoords,
+                pathLossExponent = 2.0,
+                referenceRSSI = -35.92,
+                iterationCount = 10
+            )
+
+// Sonuç
+            Log.e("ERLAK", "Tahmini konum = x:${estimatedXY.first}, y:${estimatedXY.second}")
+        }
 
         binding.buttonTest.setOnClickListener {
 
