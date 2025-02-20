@@ -9,17 +9,23 @@
 
     <Button
         android:id="@+id/buttonTest"
-        android:layout_width="0dp"
+        android:layout_width="284dp"
         android:layout_height="80dp"
-        android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
         android:layout_marginEnd="16dp"
         android:text="TEST ET"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <!-- LineChart Bileşeni -->
+
+    <Button
+        android:id="@+id/buttonErlakTest"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Erlak Test"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <com.github.mikephil.charting.charts.LineChart
         android:id="@+id/lineChart"
