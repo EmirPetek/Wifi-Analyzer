@@ -17,6 +17,6 @@ class AroundWifiInformationDeviceResultViewModel : ViewModel() {
 
     fun getRssiList(folderName:String,context: Context){
         rssiSignalList.value = repoRssiSignal.listTxtFiles(folderName, context)
-        Log.e("listttt", repoRssiSignal.listTxtFiles(folderName, context).toString())
+        //Log.e("listttt", repoRssiSignal.listTxtFiles(folderName, context).toString())
     }
 }

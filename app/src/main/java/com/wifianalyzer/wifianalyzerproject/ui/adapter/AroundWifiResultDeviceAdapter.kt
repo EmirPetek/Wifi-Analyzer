@@ -39,7 +39,8 @@ class AroundWifiResultDeviceAdapter(
         holder.textViewCardDeviceResultName.text = result.get(position)
 
         holder.cardviewDeviceResultName.setOnClickListener {
-            Log.e("UNIXTS DEĞERİ -> ", result[position].toString())
+            Log.e("txtFileName -> ", result[position].toString())
+            Log.e("folderName -> ", folderNameAsunixtimestamp.toString())
 
 
              val bundle = Bundle().apply {

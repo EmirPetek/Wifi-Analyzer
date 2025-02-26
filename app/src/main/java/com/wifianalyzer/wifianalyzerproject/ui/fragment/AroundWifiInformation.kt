@@ -12,7 +12,6 @@ import android.net.wifi.WifiManager
 import android.os.Build
 import androidx.fragment.app.viewModels
 import android.os.Bundle
-import android.os.Environment
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
@@ -221,11 +220,10 @@ class AroundWifiInformation : Fragment() {
                 //Log.e("AnotherClass", "Gyroscope - x: ${gyroscopeObj.x}, y: ${gyroscopeObj.y}, z: ${gyroscopeObj.z}")
 
 
-
                 val deviceLocation = DeviceLocation(deviceLocationX,deviceLocationY,deviceLocationZ)
                 // Gelen sonuçları veritabanına kaydetme işlemi
                 for (it in results) {
-                    rssiObjList = RssiSignalData(
+                    rssiObjList = (RssiSignalData(
                         it.SSID,
                         it.BSSID,
                         it.level,
@@ -238,13 +236,19 @@ class AroundWifiInformation : Fragment() {
                         it.is80211mcResponder.toString(),
                         folderName,
                         directory,
-                        deviceLocation
-                    )
-                    //Log.e("veritabanı: ",  "dbye kaydedildi")
-
-                    // Veritabanına ekleme işlemi yapılabilir
+                        deviceLocation,
+                        it.frequency,
+                        it.channelWidth,
+                        it.centerFreq0,
+                        it.centerFreq1
+                    ))
                     viewModel.insertRssiSignal(rssiObjList, userKey, unixtimestamp)
+                    //Log.e("veritabanı: ",  "dbye kaydedildi")
+                    // Veritabanına ekleme işlemi yapılabilir
                 }
+
+                Log.e("rssiobjlist: ", rssiObjList.toString())
+
             }
 
             binding.progressBarAroundWifi.visibility = View.GONE

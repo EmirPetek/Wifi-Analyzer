@@ -34,8 +34,11 @@ class AroundWifiInformationMeasurementResultList : Fragment() {
         val folderName = arguments?.getString("folderName")!!
         val txtFileName = arguments?.getString("txtFileName")!!
 
+        Log.e("folderAndTxtFileName: ","folder: $folderName && txtFileName: $txtFileName")
+
         viewModel.getMeasurements(requireContext(),folderName,txtFileName)
         viewModel.measurementResult.observe(viewLifecycleOwner, Observer { it ->
+            Log.e("AroundWifiInformationMeasurementResultList",it)
             binding.recyclerviewAroundWifiInformationMeasurementResult.setHasFixedSize(true)
             adapter = AroundWifiInformationMeasurementResultListAdapter(parseMeasurementDataFromTxt(it))
             binding.recyclerviewAroundWifiInformationMeasurementResult.layoutManager = LinearLayoutManager(requireContext())
@@ -60,8 +63,6 @@ class AroundWifiInformationMeasurementResultList : Fragment() {
             // Satırı virgüle göre parçala
             val values = line.split(",").filter { it.isNotBlank() }
 
-            // 10 eleman olup olmadığını kontrol et
-            if (values.size == 10) {
                 try {
                     val measurement = MeasurementParameters(
                         rssi = values[0],
@@ -79,9 +80,7 @@ class AroundWifiInformationMeasurementResultList : Fragment() {
                 } catch (e: Exception) {
                     e.printStackTrace()
                 }
-            } else {
-                println("Hatalı veri satırı: $line")
-            }
+
         }
 
         return measurementList

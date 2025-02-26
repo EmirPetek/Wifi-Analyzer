@@ -43,6 +43,14 @@ class FormulaTestFragment : Fragment() {
                 Pair(61.80, 0.75),
             )
 
+           // val rssiValues = doubleArrayOf(-52.0,-28.0,-71.0,-55.0) // AP sayısı kadar
+//            val apCoords = arrayOf(
+//                Pair(0.1,2.70),
+//                Pair(3.20,0.30),
+//                Pair(2.80,2.30)
+//            )
+
+
 // Tek fonksiyonla konum hesapla:
             val estimatedXY = ERLAKCalculator.estimateRealTimeLocation(
                 rssiValues,

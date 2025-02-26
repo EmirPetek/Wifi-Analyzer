@@ -1,7 +1,6 @@
 package com.wifianalyzer.wifianalyzerproject.repository
 
 import android.content.Context
-import android.os.Environment
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import com.google.firebase.database.DataSnapshot
@@ -25,37 +24,39 @@ class RssiSignalsRepo : rssiSignalRepoFunctions{
 
     val dbRefRssiSignal = FirebaseDatabase.getInstance().getReference("rssiSignals")
 
-     override fun insertRssiSignal(obj: RssiSignalData, userkey: String, unixtimestamp: Long){
+     fun insertRssiSignal(obj: RssiSignalData){
         /*val db = dbRefRssiSignal.child(userkey).child(unixtimestamp.toString())
         db.push().setValue(obj).addOnFailureListener { it ->
             Log.e("hata: ", it.toString())
         }*/
 
-         val fileName = "${obj.ssid}&${obj.bssid!!.replace(":","-")}.txt"
-         val file = File(obj.directory,fileName)
+             val fileName = "${obj.ssid}&${obj.bssid!!.replace(":", "-")}.txt"
+             val file = File(obj.directory, fileName)
 
-         Log.e("file: ", file.toString())
-         Log.e("fileExist: ", file.exists().toString())
+             Log.e("file: ", file.toString())
+             Log.e("fileExist: ", file.exists().toString())
 
-         // Eğer dosya yoksa oluştur
-         if (!file.exists()) {
-             val isFileCreated = file.createNewFile()
-             if (!isFileCreated) {
-                 throw IOException("Dosya oluşturulamadı!")
+             // Eğer dosya yoksa oluştur
+             if (!file.exists()) {
+                 val isFileCreated = file.createNewFile()
+                 if (!isFileCreated) {
+                     throw IOException("Dosya oluşturulamadı!")
+                 }
              }
-         }
 
 
-         val fileWriter = FileWriter(file,true)
-         val data = "" +
-                 "${obj.rssi}," +
-                 "${obj.sensorAccelerometer!!.x},${obj.sensorAccelerometer.y},${obj.sensorAccelerometer.z}," +
-                 "${obj.sensorGyroscope!!.x},${obj.sensorGyroscope.y},${obj.sensorGyroscope.z}," +
-                 "${obj.deviceLocation!!.x},${obj.deviceLocation.y},${obj.deviceLocation.z},"
+             val fileWriter = FileWriter(file, true)
+             val data = "" +
+                     "${obj.rssi}," +
+                     "${obj.sensorAccelerometer!!.x},${obj.sensorAccelerometer.y},${obj.sensorAccelerometer.z}," +
+                     "${obj.sensorGyroscope!!.x},${obj.sensorGyroscope.y},${obj.sensorGyroscope.z}," +
+                     "${obj.deviceLocation!!.x},${obj.deviceLocation.y},${obj.deviceLocation.z},${obj.location}," +
+                     "${obj.bssid},${obj.wifiStandart},${obj.mcResponder_802_11},${obj.frequency}," +
+                     "${obj.channelWidth},${obj.centerFreq0},${obj.centerFreq1}"
 
-         fileWriter.append(data+"\n")
-         fileWriter.close()
-
+             fileWriter.append(data + "\n")
+             fileWriter.close()
+             Log.e("save state: ", "saved")
 
     }
 
