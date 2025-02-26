@@ -20,7 +20,12 @@ data class RssiSignalData(
     val mcResponder_802_11: String? = null,
     val folderName : String? = null,
     val directory : File? = null,
-    val deviceLocation: DeviceLocation? = null
+    val deviceLocation: DeviceLocation? = null,
+    val frequency: Int? = null,
+    val channelWidth: Int? = null,
+    val centerFreq0: Int? = null,
+    val centerFreq1: Int? = null,
+
     ) : Serializable {
 
 

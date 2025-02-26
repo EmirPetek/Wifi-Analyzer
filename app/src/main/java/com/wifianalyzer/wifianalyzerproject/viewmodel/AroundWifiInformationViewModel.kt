@@ -1,5 +1,6 @@
 package com.wifianalyzer.wifianalyzerproject.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.wifianalyzer.wifianalyzerproject.data.RssiSignalData
@@ -11,7 +12,9 @@ class AroundWifiInformationViewModel : ViewModel() {
     var rssiUnixtsList : MutableLiveData<List<Long>> = rssiSignalRepo.rssiSignalUnixtsList
 
     fun insertRssiSignal(obj: RssiSignalData, userkey: String, unixtimestamp: Long){
-        rssiSignalRepo.insertRssiSignal(obj,userkey,unixtimestamp)
+        rssiSignalRepo.insertRssiSignal(obj)
+        Log.e("save state: ", "viewmodel")
+
     }
 
     fun getRssiUnixtsListData(userkey: String){

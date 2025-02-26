@@ -2,6 +2,7 @@ package com.wifianalyzer.wifianalyzerproject.ui.fragment.aroundWifiResultsList.n
 
 import androidx.fragment.app.viewModels
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -34,6 +35,8 @@ class AroundWifiInformationResultDevice : Fragment() {
 
         viewModel.getRssiList(folderNameAsunixtimestamp.toString(),requireContext())
         viewModel.rssiSignalList.observe(viewLifecycleOwner, Observer { it ->
+            Log.e("folderNameAsunixtimestamp",folderNameAsunixtimestamp.toString())
+            Log.e("AroundWifiInformationResultDevice", it.toString())
             binding.recyclerviewDeviceResult.setHasFixedSize(true)
             adapter = AroundWifiResultDeviceAdapter(requireContext(),it,folderNameAsunixtimestamp)
             binding.recyclerviewDeviceResult.layoutManager = LinearLayoutManager(requireContext())
