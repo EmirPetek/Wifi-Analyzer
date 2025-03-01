@@ -25,7 +25,7 @@ data class RssiSignalData(
     val channelWidth: Int? = null,
     val centerFreq0: Int? = null,
     val centerFreq1: Int? = null,
-
+    val numberOfPeople: Int? = null
     ) : Serializable {
 
 

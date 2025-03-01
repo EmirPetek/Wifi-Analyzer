@@ -52,7 +52,7 @@ class RssiSignalsRepo : rssiSignalRepoFunctions{
                      "${obj.sensorGyroscope!!.x},${obj.sensorGyroscope.y},${obj.sensorGyroscope.z}," +
                      "${obj.deviceLocation!!.x},${obj.deviceLocation.y},${obj.deviceLocation.z},${obj.location}," +
                      "${obj.bssid},${obj.wifiStandart},${obj.mcResponder_802_11},${obj.frequency}," +
-                     "${obj.channelWidth},${obj.centerFreq0},${obj.centerFreq1}"
+                     "${obj.channelWidth},${obj.centerFreq0},${obj.centerFreq1},${obj.numberOfPeople}"
 
              fileWriter.append(data + "\n")
              fileWriter.close()

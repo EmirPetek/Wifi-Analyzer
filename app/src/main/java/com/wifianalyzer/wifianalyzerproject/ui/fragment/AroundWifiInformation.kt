@@ -71,6 +71,7 @@ class AroundWifiInformation : Fragment() {
     var deviceLocationX = 0.0f
     var deviceLocationY = 0.0f
     var deviceLocationZ = 0.0f
+    var numberOfPeople = 0
 
 
     override fun onCreateView(
@@ -240,7 +241,8 @@ class AroundWifiInformation : Fragment() {
                         it.frequency,
                         it.channelWidth,
                         it.centerFreq0,
-                        it.centerFreq1
+                        it.centerFreq1,
+                        numberOfPeople,
                     ))
                     viewModel.insertRssiSignal(rssiObjList, userKey, unixtimestamp)
                     //Log.e("veritabanı: ",  "dbye kaydedildi")
@@ -295,6 +297,7 @@ class AroundWifiInformation : Fragment() {
         val etDeviceLocationX = dialogView.findViewById<android.widget.EditText>(R.id.etDeviceLocationX)
         val etDeviceLocationY = dialogView.findViewById<android.widget.EditText>(R.id.etDeviceLocationY)
         val etDeviceLocationZ = dialogView.findViewById<android.widget.EditText>(R.id.etDeviceLocationZ)
+        val etNumberOfPeople = dialogView.findViewById<android.widget.EditText>(R.id.etNumberOfPeople)
         val btnCancel = dialogView.findViewById<Button>(R.id.btnCancel)
         val btnOk = dialogView.findViewById<Button>(R.id.btnOk)
 
@@ -312,6 +315,7 @@ class AroundWifiInformation : Fragment() {
             deviceLocationX = etDeviceLocationX.text.toString().toFloatOrNull() ?: 0.0f
             deviceLocationY = etDeviceLocationY.text.toString().toFloatOrNull() ?: 0.0f
             deviceLocationZ = etDeviceLocationZ.text.toString().toFloatOrNull() ?: 0.0f
+            numberOfPeople = etNumberOfPeople.text.toString().toIntOrNull() ?: 0
 
             // txt dizininde ölçümün yapıldığı zamanın dosya adı, txtler bu dosya içine kaydediecek.
             folderName = System.currentTimeMillis().toString()
